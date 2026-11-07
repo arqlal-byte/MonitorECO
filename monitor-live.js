@@ -70,6 +70,27 @@ function neutral(message){
 
 /* La comprobación del Dashboard es independiente de la revisión de Sheets.
    Solo datos técnicos publicados por el backend privado; nunca credenciales ni resultados. */
+function dashboardDiagnostic(data){
+ if(!data||!Array.isArray(data.apps))return null;
+ var d=data.apps.find(function(a){return a&&a.key==='dashboard';});
+ if(!d||d.check!=='CONSULTA_EJECUTIVA')return null;
+ var age=Date.now()-Date.parse(d.checkedAt||'');
+ if(!isFinite(age)||age<0||age>20*60*1000)return null;
+ return d;
+}
+function dashboardReason(a){
+ if(!a)return 'El servicio no ha publicado una comprobación del Dashboard. Revisa que la versión nueva del Monitor ECO esté desplegada y que se haya ejecutado verificarDashboardECO_Ahora.';
+ var text={
+  'SIN_CONFIGURACION':'La clave privada todavía no está disponible en las propiedades del proyecto Monitor ECO.',
+  'NO_AUTORIZADO':'El Dashboard rechazó la autenticación de la comprobación. Revisa que ambos proyectos tengan exactamente la misma clave privada, sin publicarla.',
+  'SIN_RESPUESTA_VALIDA':'El Monitor no obtuvo una respuesta válida del endpoint del Dashboard. Verifica el despliegue /exec y sus registros de ejecución.',
+  'CONSULTA_FALLIDA':'El Dashboard recibió la comprobación, pero su consulta ejecutiva reportó un error. Revisa los registros del Apps Script del Dashboard.',
+  'CONSULTA_EXITOSA':'La consulta ejecutiva se comprobó correctamente.',
+  'CONTROL_OCUPADO':'El servicio estaba ocupado; conviene repetir la comprobación.',
+  'SIN_RESPUESTA':'No se recibió resultado comprobable.'
+ };
+ return text[String(a.code||'')]||'Existe una comprobación pendiente o no concluyente. Código técnico: '+String(a.code||'SIN_CODIGO').replace(/[^A-Z0-9_]/g,'').slice(0,40)+'.';
+}
 function verifiedDashboard(data){
  if(!data||!Array.isArray(data.apps))return null;
  var d=data.apps.find(function(a){return a&&a.key==='dashboard';});
@@ -215,6 +236,17 @@ function apply(data){
  }
  var footer=document.querySelector('.footer');
  if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Metadatos de Sheets verificados por un proyecto independiente. Última lectura: '+esc(data.lastCheck||'sin datos')+'</span><strong>LAS SEIS APLICACIONES NO TIENEN PRUEBA FUNCIONAL CONECTADA</strong>';
+ var diagnostic=dashboardDiagnostic(data);
+ if(diagnostic&&diagnostic.status==='unverified'){
+   var dashNode=document.querySelector('.appnode[data-app="0"]');
+   if(dashNode){
+     var label=dashNode.querySelector('.node-status'),t=dashNode.querySelector('.node-time');
+     if(label&&label.lastChild)label.lastChild.textContent=' Comprobación pendiente';
+     if(t)t.textContent=String(diagnostic.code||'SIN_CODIGO').slice(0,40).replace(/[^A-Z0-9_]/g,'');
+   }
+   var info=document.querySelector('.notice');
+   if(info)info.textContent+=' · Dashboard: '+dashboardReason(diagnostic);
+ }
  renderDashboard(data,stale);
 }
 function renderHistory(history,counts){
@@ -273,7 +305,12 @@ document.querySelectorAll('.appnode').forEach(function(node){
      $('drawer-desc').style.whiteSpace='pre-line';
      openDrawer('Dashboard Ejecutivo ECO',detail,checked.status==='ok'?'CONSULTA CORRECTA':checked.status==='warning'?'ADVERTENCIA':'ERROR DE CONSULTA');
    }else{
-     openDrawer(data?data.name:'Aplicación ECO','Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.','SIN PRUEBA FUNCIONAL');
+     var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):null;
+     var explanation=app==='dashboard'?
+       dashboardReason(diagnostic)+'\nLos estados de Sheets no prueban por sí solos que el Dashboard funcione.':
+       'Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.';
+     $('drawer-desc').style.whiteSpace='pre-line';
+     openDrawer(data?data.name:'Aplicación ECO',explanation,diagnostic?'COMPROBACIÓN PENDIENTE':'SIN PRUEBA FUNCIONAL');
    }
  },true);
 });
