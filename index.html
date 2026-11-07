@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06152e">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Monitor ECO — Centro de Monitoreo [Demo]</title>
+<style>
+:root{color-scheme:dark;--bg:#030b19;--surface:#071a36;--surface2:#0a2445;--line:#087cc8;--cyan:#2cdbff;--ice:#bdeaff;--text:#e7f6ff;--muted:#8caaca;--green:#45f377;--yellow:#ffcc48;--red:#ff607a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;min-width:320px}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 48% 70% at 50% 32%,#075b9b3b,transparent 72%),radial-gradient(ellipse 40% 40% at 90% 70%,#05416e22,transparent),linear-gradient(135deg,#020712,#06142b 60%,#020918)}
+button{font:inherit}button:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}button{cursor:pointer}
+.dashboard{max-width:1920px;margin:0 auto;padding:13px clamp(12px,1.2vw,23px) 15px;overflow:hidden}
+.header{min-height:72px;display:grid;grid-template-columns:minmax(210px,1fr) minmax(370px,1.35fr) minmax(265px,1fr);align-items:center;gap:14px;position:relative}
+.corporate{display:flex;align-items:center;min-width:0}.corporate img{width:100%;max-width:300px;max-height:63px;object-fit:contain;object-position:left center;filter:drop-shadow(0 1px 6px #002c50)}
+.brand-title{text-align:center;position:relative;isolation:isolate}.brand-title:before{content:"";position:absolute;inset:-4px 3%;border-bottom:2px solid #007cc5;transform:skew(-28deg);z-index:-1;box-shadow:0 8px 18px #00abff33}
+.brand-title h1{font-size:clamp(25px,2.35vw,43px);letter-spacing:2px;color:#f4fbff;margin:0;text-shadow:0 0 22px #0bd5ff99;font-weight:900;line-height:1.05}.brand-title p{font-size:11px;letter-spacing:1.2px;margin:4px 0 0;color:#9ed7fa}
+.header-right{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap}
+.demo-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #f0ba4c70;background:#714e121c;color:#ffda85;padding:9px 11px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}
+.demo-pill .light{width:8px;height:8px;border-radius:50%;background:var(--yellow);box-shadow:0 0 12px var(--yellow);animation:blink 2.8s infinite}
+.clock{font-size:11px;text-align:right;color:#acd0ec;min-width:125px}.clock strong{display:block;color:white;font-size:15px}
+.controls{display:flex;gap:7px;justify-content:flex-end;margin:3px 0 9px;flex-wrap:wrap;align-items:center}
+.notice{margin-right:auto;display:flex;gap:8px;align-items:center;color:#ffdf95;font-size:11px;letter-spacing:.2px}
+.ctrl{border:1px solid #176293;border-radius:8px;background:#08264b;color:#d7edff;padding:7px 10px;font-weight:700;font-size:11px;transition:background .2s,box-shadow .2s}.ctrl:hover,.ctrl[aria-pressed="true"]{background:#12517c;box-shadow:0 0 15px #078ddc44}.ctrl.danger{border-color:#a98b36;color:#ffdc7d}.ctrl.outline{background:transparent}
+.metrics{display:grid;grid-template-columns:1.55fr repeat(7,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.kpi{height:92px;border:1px solid #126bab;border-radius:11px;background:linear-gradient(135deg,#09213f,#06152f 72%);box-shadow:inset 0 0 16px #0686cb1c,0 2px 12px #000b1e;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;position:relative;overflow:hidden;padding:8px 7px}
+.kpi:before,.panel:before{content:"";position:absolute;left:7%;right:7%;top:0;height:1px;background:linear-gradient(90deg,transparent,#2dd4ff73,transparent)}
+.kpi .number{font-size:clamp(22px,1.9vw,33px);line-height:1.05;font-weight:900;color:#fff;text-shadow:0 0 18px #1091ff88}.kpi .hint{font-size:10px;color:#c1dcf1;line-height:1.22;margin-top:4px}.kpi .symbol{font-size:17px;color:#29d9ff;margin-bottom:4px}
+.kpi.major{flex-direction:row;gap:11px;text-align:left;justify-content:space-evenly}.kpi.major .gauge{height:69px;width:69px;min-width:69px;border-radius:50%;background:conic-gradient(var(--cyan) 0 13%,#173450 13% 100%);padding:7px;animation:slowSpin 18s linear infinite;position:relative}.kpi.major .gauge:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#06182e}.kpi.major .gauge span{position:absolute;z-index:1;inset:0;display:grid;place-items:center;font-size:20px;font-weight:900;color:#b9e7ff}
+.kpi.major h2{font-size:12px;color:#c5dfef;margin:0 0 3px}.kpi.major strong{font-size:clamp(14px,1.2vw,21px);line-height:1.1;color:#6de6ff;display:block}
+.kpi.warn .symbol,.kpi.warn .number{color:var(--yellow)}.kpi.error .symbol,.kpi.error .number{color:var(--red)}
+.main-grid{display:grid;grid-template-columns:minmax(225px,.91fr) minmax(550px,1.75fr) minmax(245px,.96fr);gap:10px;align-items:stretch}
+.rail{display:grid;grid-template-rows:1fr 1fr 1fr;gap:10px;min-height:515px}
+.panel{border:1px solid #0c6aaf;background:linear-gradient(145deg,#082041e8,#04152eeb);border-radius:12px;position:relative;overflow:hidden;box-shadow:inset 0 0 28px #0873ba12,0 0 12px #006eb020;padding:12px 14px}
+.panel-title{display:flex;align-items:center;gap:8px;color:#e6faff;font-weight:850;font-size:12px;letter-spacing:.2px;margin-bottom:9px}
+.panel-title .tick{width:8px;height:8px;background:#22b9ff;transform:rotate(45deg);box-shadow:0 0 8px #42dbff}.panel-title .aux{margin-left:auto;color:#769dc6;font-size:10px;font-weight:600}
+.axis{font-size:9px;fill:#8db5d2}.gridline{stroke:#1b486d;stroke-width:1;stroke-dasharray:3 5}.line-chart{height:93px;width:100%;overflow:visible}
+.line-chart .chart-shadow{stroke:#0eb6ff;fill:none;stroke-width:8;opacity:.12;filter:blur(6px)}.line-chart .chart-line{stroke:#49ff86;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px #45f377)}.line-chart .chart-dot{fill:#5fff88;stroke:#0c553b;stroke-width:2}
+.days{display:flex;justify-content:space-between;color:#94b7d4;font-size:9px;margin:2px 2px 0}
+.bars{display:flex;justify-content:space-around;align-items:flex-end;height:102px;border-bottom:1px solid #1a5179;padding:0 4px 1px;gap:8px}.bars .bar-wrap{height:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
+.bars .bar{width:min(100%,28px);height:var(--height);background:linear-gradient(0deg,#03518c 0%,#16b6ff 55%,#67eaff 100%);border:1px solid #4cdbff55;box-shadow:0 0 14px #058ed756;transform-origin:bottom;animation:grow .9s backwards}
+.bar-wrap em{font-size:10px;font-style:normal;color:#d9f2ff}
+.legend{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;color:#89aeca;font-size:10px}
+.event-content{display:flex;align-items:center;gap:15px;justify-content:center;min-height:96px}
+.donut{flex:0 0 auto;width:101px;height:101px;border-radius:50%;background:conic-gradient(#39e27b 0 72%,#16cbff 72% 89%,#fbc54e 89% 96%,#f05b70 96%);display:grid;place-items:center;box-shadow:0 0 12px #0a7aff66;position:relative}
+.donut:before{content:"";position:absolute;inset:17px;background:#071a37;border-radius:50%}
+.donut-inner{text-align:center;z-index:1;font-weight:900;font-size:25px;line-height:1}.donut-inner small{display:block;font-size:9px;font-weight:500;color:#adcbe6}
+.event-legend{display:grid;gap:7px;min-width:0}.legend-row{display:flex;align-items:center;gap:5px;font-size:10px;color:#c6e2f4}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%}.legend-row b{margin-left:auto;font-size:10px}
+.network-board{min-height:515px;position:relative;overflow:hidden;background:radial-gradient(ellipse 44% 47% at 50% 47%,#0e47736b 0%,#08244022 65%,transparent),linear-gradient(180deg,#07182c,#05142b);border:1px solid #0b5488;border-radius:12px;isolation:isolate}
+.network-board:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#2f7dab0d 1px,transparent 1px),linear-gradient(90deg,#2f7dab0d 1px,transparent 1px);background-size:30px 30px;transform:perspective(400px) rotateX(50deg) scale(1.5);opacity:.45;pointer-events:none}
+.network-board:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 55px #030c1d;pointer-events:none;z-index:5}
+.network-label{position:absolute;top:9px;left:12px;font-size:10px;letter-spacing:1.7px;color:#6bbadd;z-index:6}
+.network-label strong{color:#c6f6ff}
+.streams{position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:visible}
+.stream-path{stroke:#12beff;stroke-width:1.8;fill:none;opacity:.8;filter:drop-shadow(0 0 5px #01baff)}
+.stream-flow{fill:none;stroke:#b5faff;stroke-width:2;stroke-linecap:round;stroke-dasharray:2 24;animation:movePath 3.8s linear infinite;filter:drop-shadow(0 0 5px #48dcff)}
+.hub{position:absolute;left:50%;top:50%;width:clamp(215px,31%,310px);height:295px;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.halo{position:absolute;width:105%;height:82px;border:2px solid #079af8;border-radius:50%;left:50%;bottom:14px;transform:translateX(-50%) rotate(-8deg);box-shadow:0 0 15px #11c7ff, inset 0 0 15px #0bd3ff55;animation:breath 3s ease-in-out infinite}
+.halo:after{content:"";position:absolute;inset:12px 10px;border:1px dashed #43d9ff;border-radius:50%;animation:slowSpin 19s linear infinite}
+.hub-svg{position:relative;width:100%;height:240px;filter:drop-shadow(0 0 16px #0caaff88);animation:float 5s ease-in-out infinite}
+.hub-base{position:absolute;bottom:11px;color:#79ceff;letter-spacing:1.3px;font-size:9px;font-weight:850;text-shadow:0 0 9px #50ddff}
+.appnode{position:absolute;z-index:3;width:clamp(154px,26%,200px);min-height:90px;border:1px solid #1473ba;background:linear-gradient(110deg,#071b3ce8,#06172fea);border-radius:10px;padding:11px 10px 8px 48px;box-shadow:0 0 12px #068cff2f;transition:transform .25s,box-shadow .25s,border-color .25s;text-align:left;color:white}
+.appnode:hover{transform:translateY(-3px);box-shadow:0 0 24px #08baff70;border-color:#60e3ff}
+.appnode.left1{top:14%;left:1.8%}.appnode.left2{top:42%;left:1.8%}.appnode.left3{top:70%;left:1.8%}.appnode.right1{top:14%;right:1.8%}.appnode.right2{top:42%;right:1.8%}.appnode.right3{top:70%;right:1.8%}
+.node-icon{position:absolute;top:10px;left:9px;width:31px;height:31px;border-radius:50%;background:linear-gradient(135deg,#0f5282,#0a244f);border:1px solid #27d0ff;display:grid;place-items:center;color:#7be7ff;box-shadow:0 0 13px #16b5ff44;font-size:18px}
+.node-name{font-size:11px;font-weight:850;line-height:1.15;min-height:24px}.node-status{font-size:9px;color:#92d0f0;margin-top:4px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:0 0 auto;background:var(--green);box-shadow:0 0 9px var(--green)}.dot.warn{background:var(--yellow);box-shadow:0 0 9px var(--yellow)}.dot.error{background:var(--red);box-shadow:0 0 9px var(--red)}
+.node-time{font-size:10px;color:#a9e3ff;margin-top:4px}
+.node-tag{position:absolute;top:8px;right:7px;color:#7fb2ca;font-size:9px}
+.right-rail .panel{padding:11px 13px}
+.source-wrap{display:flex;gap:9px;align-items:center}.source-donut{width:94px;height:94px;flex:0 0 94px;border-radius:50%;border:10px solid #43ed80;box-shadow:0 0 13px #33fa7466;display:grid;place-items:center;text-align:center}
+.source-donut strong{font-size:23px}.source-donut span{font-size:9px;color:#afdbed;display:block}
+.source-counts{display:grid;gap:8px;min-width:0;flex:1;font-size:10px}.source-counts span{display:flex;justify-content:space-between;gap:4px}.source-counts b{color:#e1f9ff}
+.process-list{display:grid;gap:7px}.process{display:flex;justify-content:space-between;gap:5px;align-items:center;font-size:10px;color:#cde7f7}.process i{font-style:normal;color:#49f37f;font-size:14px}.process span{margin-right:auto;min-width:0}.process time{color:#8fb8d2}
+.activity{display:grid;gap:6px}.activity-row{font-size:10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #194b74;padding-bottom:6px;color:#cbe4f6}
+.activity-row time{color:#77b5d6;font-variant-numeric:tabular-nums}.activity-row span{min-width:0}
+.bottom-grid{display:grid;grid-template-columns:1.12fr 1.34fr 1fr;gap:10px;margin-top:10px}
+.bottom-grid .panel{min-height:169px}
+.latency{display:grid;gap:7px}.lat-row{display:grid;grid-template-columns:124px 1fr 36px;gap:8px;align-items:center;font-size:10px;color:#c1e5f9}
+.lat-track{height:10px;background:#102c50;border-radius:3px;overflow:hidden}.lat-track span{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#15c1f9,#5ae9ff);box-shadow:0 0 12px #11b0ff80;animation:sweep 1.4s both}.lat-row b{text-align:right;font-weight:700}
+.ai-panel{background:radial-gradient(circle at 90% 75%,#243d8b66,transparent 45%),linear-gradient(135deg,#0a2a57,#071935);border-color:#26b6f4}.ai-signal{color:#84f5ff;font-size:10px;letter-spacing:1px;margin-bottom:8px}
+.ai-panel h3{margin:0 0 7px;font-size:19px;color:#d9f8ff}.ai-panel p{margin:0;font-size:11px;color:#c8e2f5;line-height:1.55;max-width:500px}.ai-panel .small{font-size:9px;margin-top:12px;color:#8cafd3}
+.ai-wave{position:absolute;bottom:0;right:0;width:145px;height:65px;opacity:.5;background:repeating-radial-gradient(ellipse at 50% 100%,#04dcff 0 1px,transparent 2px 8px);mask-image:linear-gradient(90deg,transparent,black)}
+.daily{display:flex;align-items:flex-end;justify-content:space-between;gap:9px}.daily-list{flex:1;display:grid;gap:11px;font-size:11px;color:#d8f0ff}.daily-list span{display:flex;justify-content:space-between;gap:10px}.daily-list b{font-size:14px}
+.mini-bars{height:90px;width:80px;display:flex;gap:5px;align-items:flex-end}.mini-bars i{width:11px;height:var(--h);background:linear-gradient(0deg,#06417f,#32e0ff);box-shadow:0 0 9px #1ba3ef77}
+.footer{display:flex;justify-content:space-between;gap:10px;color:#7296b7;margin:10px 2px 2px;font-size:10px}.footer strong{color:#f1c878}
+.demo-watermark{position:fixed;bottom:15px;right:16px;font-size:10px;color:#ffc45f;background:#392d1788;border:1px solid #b8823270;border-radius:6px;padding:5px 8px;z-index:20;pointer-events:none;letter-spacing:.8px}
+.drawer[hidden]{display:none!important}.drawer{position:fixed;inset:0;background:#020915c9;z-index:30;display:grid;place-items:center;padding:18px}.drawer-card{background:linear-gradient(135deg,#0b2853,#051832);border:1px solid #29baf5;box-shadow:0 0 40px #028de444;max-width:450px;width:100%;border-radius:16px;padding:25px}.drawer h2{margin:0 0 8px}.drawer p{color:#accce1;font-size:13px;line-height:1.6}.drawer .tagline{font-size:11px;color:#fcd487}.drawer .close{float:right;border:1px solid #3fa6de;background:#09284e;color:#fff;border-radius:6px;padding:5px 9px}
+body.paused *,body.paused *:before,body.paused *:after{animation-play-state:paused!important}
+@keyframes grow{from{transform:scaleY(.02)}to{transform:scaleY(1)}}@keyframes sweep{from{width:0}to{width:var(--w)}}@keyframes float{50%{transform:translateY(-9px)}}@keyframes breath{50%{box-shadow:0 0 24px #21e8ff,inset 0 0 22px #31d5ff80;opacity:.76}}@keyframes movePath{to{stroke-dashoffset:-208}}@keyframes slowSpin{to{transform:rotate(360deg)}}@keyframes blink{50%{opacity:.55}}
+@media(max-width:1320px){.metrics{grid-template-columns:1.65fr repeat(7,1fr)}.main-grid{grid-template-columns:minmax(205px,.86fr) minmax(450px,1.72fr) minmax(220px,.96fr)}.appnode{width:165px;padding-left:41px}.node-name{font-size:10px}.node-icon{width:27px;height:27px;left:6px}.lat-row{grid-template-columns:100px 1fr 32px}}
+@media(max-width:1050px){.header{grid-template-columns:1fr 1.35fr}.header-right{grid-column:1/-1;justify-content:center}.metrics{grid-template-columns:repeat(4,1fr)}.kpi.major{grid-column:span 2}.main-grid{grid-template-columns:1fr 1fr}.network-board{grid-column:1/-1;grid-row:1;min-height:530px}.rail{grid-template-rows:repeat(3,minmax(145px,1fr));min-height:0}.bottom-grid{grid-template-columns:1fr 1fr}.bottom-grid .ai-panel{grid-column:span 2}}
+@media(max-width:680px){.dashboard{padding:10px}.header{display:flex;flex-direction:column;gap:7px}.corporate img{max-width:250px;max-height:55px}.brand-title h1{font-size:27px}.header-right{justify-content:center}.controls{justify-content:center}.notice{flex:1 0 100%;text-align:center;justify-content:center}.metrics{grid-template-columns:repeat(2,1fr)}.kpi.major{grid-column:span 2}.kpi{height:81px}.main-grid{display:flex;flex-direction:column}.network-board{order:0;min-height:580px}.rail{order:1;display:grid;grid-template-columns:1fr;grid-template-rows:none;gap:8px}.left-rail{order:1}.right-rail{order:2}.panel{min-height:135px}.appnode{width:165px;min-height:88px}.hub{width:190px;height:250px}.appnode.left1{top:11%;left:0}.appnode.left2{top:42%;left:0}.appnode.left3{top:73%;left:0}.appnode.right1{top:11%;right:0}.appnode.right2{top:42%;right:0}.appnode.right3{top:73%;right:0}.bottom-grid{grid-template-columns:1fr}.bottom-grid .ai-panel{grid-column:auto}.footer{flex-direction:column}.demo-watermark{bottom:7px;right:7px}}
+@media(max-width:460px){.network-board{min-height:640px}.hub{top:47%;width:140px;height:205px}.appnode{width:calc(50% - 6px);font-size:10px;min-height:92px;padding:9px 5px 7px}.appnode .node-icon{display:none}.appnode .node-name{font-size:9px;min-height:30px}.appnode .node-status{font-size:9px;line-height:1.1}.appnode.left1,.appnode.right1{top:8%}.appnode.left2,.appnode.right2{top:74%}.appnode.left3,.appnode.right3{top:88%}.node-time{font-size:9px}.node-tag{font-size:8px;right:4px}.hub-base{font-size:7px}.network-label{font-size:9px}.bottom-grid .panel{min-height:160px}.lat-row{grid-template-columns:111px 1fr 32px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="dashboard" id="dashboard">
+<header class="header">
+  <div class="corporate"><img src="https://arqlal-byte.github.io/EvaluacionECO360/assets/eco-cocacola-oficial.png" alt="Logotipos corporativos oficiales de Embotelladora de Colima y Coca-Cola" width="520" height="130"></div>
+  <div class="brand-title"><h1>MONITOR ECO</h1><p>CENTRO DE MONITOREO DEL ECOSISTEMA</p></div>
+  <div class="header-right"><div class="demo-pill"><span class="light"></span> MODO DEMOSTRACIÓN</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
+</header>
+<div class="controls">
+  <div class="notice">◆ Vista conceptual animada · Sin datos reales ni conexiones activas</div>
+  <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
+  <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
+  <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
+  <button class="ctrl danger" id="incident" aria-pressed="false">Simular incidencia</button>
+  <button class="ctrl outline" id="pause">Pausar animaciones</button>
+</div>
+<section class="metrics" aria-label="Indicadores generales demostrativos">
+  <div class="kpi major"><div class="gauge"><span>DEMO</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">ESCENARIO ESTABLE</strong><div class="hint">Visualización de ejemplo</div></div></div>
+  <div class="kpi"><div class="symbol">◈</div><div class="number">6</div><div class="hint">Aplicaciones objetivo</div></div>
+  <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">6</div><div class="hint">Operativas en la muestra</div></div>
+  <div class="kpi warn"><div class="symbol">⚠</div><div class="number" id="warnings">0</div><div class="hint">Advertencias demo</div></div>
+  <div class="kpi error"><div class="symbol">✕</div><div class="number" id="failures">0</div><div class="hint">Fallas demo</div></div>
+  <div class="kpi"><div class="symbol">▤</div><div class="number">12</div><div class="hint">Fuentes simuladas</div></div>
+  <div class="kpi"><div class="symbol">⚙</div><div class="number">8</div><div class="hint">Procesos simulados</div></div>
+  <div class="kpi"><div class="symbol">▥</div><div class="number">99.8%</div><div class="hint">Disponibilidad ejemplo</div></div>
+</section>
+<section class="main-grid">
+  <div class="rail left-rail">
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">7 días · DEMO</span></div>
+      <svg class="line-chart" id="stability-chart" viewBox="0 0 300 100" role="img" aria-label="Gráfica demostrativa de estabilidad"><line class="gridline" x1="4" x2="296" y1="20" y2="20"/><line class="gridline" x1="4" x2="296" y1="50" y2="50"/><line class="gridline" x1="4" x2="296" y1="80" y2="80"/><path class="chart-shadow" id="line-shadow"/><path class="chart-line" id="line-path"/><g id="chart-points"></g></svg>
+      <div class="days" id="chart-days"><span>Sáb</span><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span></div>
+    </article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Incidencias por día <span class="aux">MUESTRA</span></div><div class="bars" id="incidence-bars"></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">MUESTRA</span></div><div class="event-content"><div class="donut"><div class="donut-inner">8<small>eventos demo</small></div></div><div class="event-legend"><div class="legend-row"><i class="legend-dot" style="background:#39e27b"></i>Normal <b>72%</b></div><div class="legend-row"><i class="legend-dot" style="background:#16cbff"></i>Procesos <b>17%</b></div><div class="legend-row"><i class="legend-dot" style="background:#fbc54e"></i>Advertencias <b>7%</b></div><div class="legend-row"><i class="legend-dot" style="background:#f05b70"></i>Incidencias <b>4%</b></div></div></div></article>
+  </div>
+  <main class="network-board" aria-label="Topología visual interactiva de seis aplicaciones">
+    <div class="network-label">◈ TOPOLOGÍA DEL <strong>ECOSISTEMA ECO</strong> · DEMO</div>
+    <svg class="streams" viewBox="0 0 800 520" preserveAspectRatio="none" aria-hidden="true">
+      <path class="stream-path" d="M400 255 L260 110 L145 110"/><path class="stream-flow" d="M400 255 L260 110 L145 110"/>
+      <path class="stream-path" d="M400 255 L265 260 L145 260"/><path class="stream-flow" d="M400 255 L265 260 L145 260"/>
+      <path class="stream-path" d="M400 255 L260 405 L145 405"/><path class="stream-flow" d="M400 255 L260 405 L145 405"/>
+      <path class="stream-path" d="M400 255 L540 110 L655 110"/><path class="stream-flow" d="M400 255 L540 110 L655 110"/>
+      <path class="stream-path" d="M400 255 L535 260 L655 260"/><path class="stream-flow" d="M400 255 L535 260 L655 260"/>
+      <path class="stream-path" d="M400 255 L540 405 L655 405"/><path class="stream-flow" d="M400 255 L540 405 L655 405"/>
+      <circle cx="400" cy="255" r="154" stroke="#05baff" opacity=".10" fill="none" stroke-dasharray="3 12"/>
+    </svg>
+    <div class="hub"><div class="halo"></div>
+      <svg class="hub-svg" viewBox="0 0 320 310" aria-hidden="true">
+        <defs><linearGradient id="hubsurface" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#08caff"/><stop offset=".5" stop-color="#095aab"/><stop offset="1" stop-color="#082b5a"/></linearGradient><linearGradient id="side" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c68c5"/><stop offset="1" stop-color="#040c2c"/></linearGradient></defs>
+        <ellipse cx="160" cy="263" rx="135" ry="28" fill="#03c8ff" opacity=".16"/>
+        <polygon points="50,220 160,168 273,220 160,272" fill="url(#hubsurface)" stroke="#3aeaff" stroke-width="3"/>
+        <polygon points="50,220 160,272 160,293 50,242" fill="#052b62" stroke="#1689d3" stroke-width="2"/>
+        <polygon points="160,272 273,220 273,242 160,293" fill="#061a4c" stroke="#1689d3" stroke-width="2"/>
+        <polygon points="87,192 160,155 234,192 160,229" fill="#0b468e" stroke="#57e9ff" stroke-width="3"/>
+        <polygon points="87,192 160,229 160,241 87,204" fill="#04316d"/>
+        <polygon points="160,229 234,192 234,205 160,241" fill="#09265b"/>
+        <polygon points="108,100 160,73 213,100 160,126" fill="#0ab3ff66" stroke="#82eeff" stroke-width="2.5"/>
+        <polygon points="108,100 160,126 160,191 108,165" fill="url(#hubsurface)" stroke="#26caff" stroke-width="2"/>
+        <polygon points="160,126 213,100 213,165 160,191" fill="url(#side)" stroke="#26caff" stroke-width="2"/>
+        <text x="160" y="149" fill="#e7fbff" font-size="20" text-anchor="middle" font-weight="900" letter-spacing="1">NÚCLEO</text>
+        <text x="160" y="166" fill="#a5dfff" font-size="9" text-anchor="middle" letter-spacing="1.5">MONITOR</text>
+        <g stroke="#6deaff" stroke-width="2" opacity=".95"><path d="M87 169 L60 158 L60 111"/><path d="M233 172 L259 159 L259 103"/><path d="M160 73 L160 35"/></g>
+        <g fill="#34dafa"><circle cx="60" cy="111" r="5"/><circle cx="259" cy="103" r="5"/><circle cx="160" cy="35" r="6"/></g>
+        <g fill="#31ecff" opacity=".85"><rect x="120" y="202" width="7" height="12"/><rect x="133" y="208" width="7" height="12"/><rect x="196" y="208" width="7" height="12"/><rect x="183" y="214" width="7" height="12"/></g>
+      </svg>
+      <div class="hub-base">CENTRO DE DATOS · ESQUEMA CONCEPTUAL</div>
+    </div>
+    <button class="appnode left1" data-app="0"><span class="node-icon">▥</span><span class="node-tag">DEMO</span><div class="node-name">Dashboard Ejecutivo ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.2 s</div></button>
+    <button class="appnode left2" data-app="2"><span class="node-icon">♧</span><span class="node-tag">DEMO</span><div class="node-name">Evaluación 360 ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 4.1 s</div></button>
+    <button class="appnode left3" data-app="4"><span class="node-icon">♙</span><span class="node-tag">DEMO</span><div class="node-name">Mi Persona ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.0 s</div></button>
+    <button class="appnode right1" data-app="1"><span class="node-icon">☷</span><span class="node-tag">DEMO</span><div class="node-name">Autoevaluación ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 2.8 s</div></button>
+    <button class="appnode right2" data-app="3"><span class="node-icon">⚙</span><span class="node-tag">DEMO</span><div class="node-name">Centro de Administración ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.5 s</div></button>
+    <button class="appnode right3" data-app="5"><span class="node-icon">♧</span><span class="node-tag">DEMO</span><div class="node-name">Familia ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.4 s</div></button>
+  </main>
+  <aside class="rail right-rail">
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">DEMO</span></div><div class="source-wrap"><div class="source-donut"><div><strong>12</strong><span>Fuentes demo</span></div></div><div class="source-counts"><span>● Operativas <b>12</b></span><span style="color:#ffdb80">▲ Advertencia <b>0</b></span><span style="color:#ff8493">✕ Error <b>0</b></span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Procesos automáticos <span class="aux">DEMO</span></div><div class="process-list"><div class="process"><i>✓</i><span>Promedios</span><time>05:00</time></div><div class="process"><i>✓</i><span>Actualización de datos</span><time>06:15</time></div><div class="process"><i>✓</i><span>Generación de informes</span><time>07:00</time></div><div class="process"><i>✓</i><span>Respaldos</span><time>01:00</time></div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Actividad reciente <span class="aux">SIMULADA</span></div><div class="activity"><div class="activity-row"><span class="dot"></span><time>18:58</time><span>Mi Persona · evidencia recibida</span></div><div class="activity-row"><span class="dot"></span><time>18:46</time><span>Evaluación 360 · envío guardado</span></div><div class="activity-row"><span class="dot"></span><time>18:30</time><span>Dashboard · PDF generado</span></div><div class="activity-row"><span class="dot"></span><time>18:15</time><span>Autoevaluación · concluida</span></div></div></article>
+  </aside>
+</section>
+<section class="bottom-grid" aria-label="Información detallada demostrativa">
+  <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">DATOS SIMULADOS</span></div><div class="latency" id="latency-list"></div></article>
+  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Diagnóstico con IA <span class="aux">CONCEPTO</span></div><div class="ai-signal">✦ RECOMENDACIÓN ILUSTRATIVA</div><h3 id="ai-title">Escenario de estabilidad</h3><p id="ai-description">Este panel mostrará diagnósticos respaldados por registros técnicos. La IA todavía no está conectada y no ha comprobado ninguna aplicación.</p><p class="small">La IA no modificará automáticamente código, datos ni permisos.</p><div class="ai-wave" aria-hidden="true"></div></article>
+  <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
+</section>
+<footer class="footer"><span>Monitor ECO V1 · Prototipo visual independiente · No conectado a Apps Script, Sheets ni Drive.</span><strong>NINGÚN ESTADO O NÚMERO CORRESPONDE A UNA VERIFICACIÓN REAL</strong></footer>
+</div>
+<div class="demo-watermark">SIMULACIÓN VISUAL</div>
+<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · DEMOSTRACIÓN</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p><strong>Fuentes:</strong> Por verificar en la siguiente etapa.</p><p class="tagline">Para habilitar datos reales necesitaremos sus referencias vigentes y pruebas de lectura autorizadas.</p></div></div>
+<script>
+(function(){
+'use strict';
+var apps=[
+{name:'Dashboard Ejecutivo ECO',note:'Consultas, informes PDF, IA integrada y fuentes ejecutivas',time:3.2},
+{name:'Autoevaluación ECO',note:'Acceso, captura, resultados y almacenamiento de autoevaluaciones',time:2.8},
+{name:'Evaluación 360 ECO',note:'Trabajadores, líderes, duplicados, guardado y promedios nocturnos',time:4.1},
+{name:'Centro de Administración ECO',note:'Accesos, operaciones administrativas y conexiones de datos',time:3.5},
+{name:'Mi Persona ECO',note:'Actividades, evidencias, sesiones y almacenamiento',time:3.0},
+{name:'Familia ECO',note:'Operaciones y verificaciones a confirmar con código vigente',time:3.4}
+];
+var incident=false,range='7d',paused=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(paused)document.body.classList.add('paused');
+function $(id){return document.getElementById(id);}
+function clock(){var now=new Date();$('fecha').textContent=new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(now);$('hora').textContent=new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}).format(now)+' h';}
+clock();setInterval(clock,30000);
+function chart(){
+ var series={ '24h':[99,99.6,98.9,99.5,99.4,99.8,99.8],'7d':[99.0,99.1,99.6,99.8,99.7,99.9,99.8],'30d':[97.5,98.2,98.1,98.9,99.2,99.5,99.8]}[range].slice();
+ if(incident)series[series.length-1]=96.5;
+ var path=series.map(function(v,i){return(i?'L':'M')+(10+i*46.5)+' '+(90-(v-95)*17).toFixed(1);}).join(' ');
+ $('line-path').setAttribute('d',path);$('line-shadow').setAttribute('d',path);
+ $('chart-points').innerHTML=series.map(function(v,i){return'<circle class="chart-dot" cx="'+(10+i*46.5)+'" cy="'+(90-(v-95)*17).toFixed(1)+'" r="4"/>';}).join('');
+ var bars=range==='24h'?[0,1,0,1,0,0,1]:range==='30d'?[2,2,3,1,2,2,1]:[2,1,3,1,0,1,0];
+ if(incident)bars[bars.length-1]=3;
+ var days=range==='24h'?['00h','04h','08h','12h','16h','20h','24h']:range==='30d'?['S1','S2','S3','S4','S5','S6','S7']:['Sáb','Dom','Lun','Mar','Mié','Jue','Vie'];
+ $('incidence-bars').innerHTML=bars.map(function(n,i){return'<div class="bar-wrap"><em>'+n+'</em><div class="bar" style="--height:'+(Math.max(2,n)*22)+'%;animation-delay:'+(i*.08)+'s"></div></div>';}).join('');
+ $('chart-days').innerHTML=days.map(function(d){return'<span>'+d+'</span>';}).join('');
+ $('period-label').textContent=({'24h':'24 horas','7d':'7 días','30d':'30 días'})[range]+' · DEMO';
+ document.querySelectorAll('[data-range]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-range')===range));});
+}
+function latency(){
+ $('latency-list').innerHTML=apps.map(function(a,i){var t=a.time+(incident&&i===2?4.8:0);return'<div class="lat-row"><span>'+a.name.replace(' ECO','')+'</span><div class="lat-track"><span style="--w:'+(t/10*100).toFixed(0)+'%;animation-delay:'+(i*.1)+'s"></span></div><b>'+t.toFixed(1)+' s</b></div>';}).join('');
+}
+function states(){
+ $('healthy').textContent=incident?'5':'6';$('warnings').textContent=incident?'1':'0';$('general-state').textContent=incident?'ALERTA DE EJEMPLO':'ESCENARIO ESTABLE';
+ document.querySelectorAll('.appnode').forEach(function(node){
+ var selected=incident&&Number(node.getAttribute('data-app'))===2;
+ var dot=node.querySelector('.dot'),text=node.querySelector('.node-status'),time=node.querySelector('.node-time');
+ dot.classList.toggle('warn',selected);
+ text.lastChild.textContent=selected?' Advertencia simulada':' Operativo (ejemplo)';
+ time.textContent='Respuesta: '+(apps[Number(node.getAttribute('data-app'))].time+(selected?4.8:0)).toFixed(1)+' s';
+ });
+ $('ai-title').textContent=incident?'Ejemplo: demora detectada':'Escenario de estabilidad';
+ $('ai-description').textContent=incident?'SIMULACIÓN: el guardado de Evaluación 360 superó el umbral de ejemplo. Una IA conectada revisaría registros y concurrencia antes de proponer una causa. No es una incidencia real.':'Este panel mostrará diagnósticos respaldados por registros técnicos. La IA todavía no está conectada y no ha comprobado ninguna aplicación.';
+ $('incident').textContent=incident?'Restablecer demostración':'Simular incidencia';
+ $('incident').setAttribute('aria-pressed',String(incident));
+ chart();latency();
+}
+document.querySelectorAll('[data-range]').forEach(function(b){b.addEventListener('click',function(){range=b.getAttribute('data-range');chart();});});
+$('incident').addEventListener('click',function(){incident=!incident;states();});
+$('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';
+$('pause').addEventListener('click',function(){paused=!paused;document.body.classList.toggle('paused',paused);$('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';});
+function openDrawer(title,desc,state){$('drawer-title').textContent=title;$('drawer-desc').textContent=desc;$('drawer-state').textContent=state;$('drawer').hidden=false;$('close-drawer').focus();}
+document.querySelectorAll('.appnode').forEach(function(b){b.addEventListener('click',function(){var i=Number(b.getAttribute('data-app')),a=apps[i];openDrawer(a.name,a.note+'. El valor de respuesta ('+a.time.toFixed(1)+' s) es demostrativo.',incident&&i===2?'Advertencia simulada':'Operativo simulado');});});
+$('sources').addEventListener('click',function(){openDrawer('Datos y Drive','Las 12 fuentes indicadas en esta pantalla son un ejemplo visual. Todavía no existe un inventario de fuentes conectadas ni se han leído datos de las seis aplicaciones.','Sin conexión real');});
+$('close-drawer').addEventListener('click',function(){$('drawer').hidden=true;});$('drawer').addEventListener('click',function(e){if(e.target===$('drawer'))$('drawer').hidden=true;});document.addEventListener('keydown',function(e){if(e.key==='Escape')$('drawer').hidden=true;});
+states();
+})();
+</script>
+<script src="./config.js"></script>
+<script src="./monitor-live.js"></script>
+</body>
+</html>
