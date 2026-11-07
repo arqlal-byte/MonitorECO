@@ -16,11 +16,9 @@ Aplicación independiente del Ecosistema ECO (Embotelladora de Colima).
 
 GitHub Pages es público: ninguna credencial, dato personal, información privada ni IDs internos de Sheets deben guardarse aquí. Todas las operaciones administrativas futuras requieren un entorno privado distinto. Las 6 aplicaciones no tienen pruebas funcionales conectadas.
 
-## Logo oficial — pendiente de independizar
+## Logotipo oficial
 
-Temporalmente se muestra el logotipo oficial **sin alterarlo** desde
-`https://arqlal-byte.github.io/EvaluacionECO360/assets/eco-cocacola-oficial.png`.
-El recurso aún está alojado en el repositorio `EvaluacionECO360`. Para la independencia completa, copiar el archivo binario oficial a `assets/eco-cocacola-oficial.png` en este repositorio y modificar la referencia en `index.html` a la ruta local. No sustituirlo con texto, dibujos ni reconstrucciones.
+El archivo `assets/eco-cocacola-oficial.png` es una copia literal del logotipo oficial que ya constaba en el código documental ECO entregado por el responsable, sin reconstrucción ni edición gráfica. El Monitor utiliza exclusivamente su propia copia, sin depender del repositorio de Evaluación 360.
 
 ## Publicación
 
