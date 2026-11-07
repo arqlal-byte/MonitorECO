@@ -4,6 +4,7 @@
  * Solo activa la conversación generativa cuando Apps Script confirma
  * que está disponible. No agrega límites de consultas.
  * Mantiene la clave API exclusivamente en Google Apps Script.
+ * Recuerda el nombre aportado durante esta conversación (no lo almacena).
  */
 (function(){
   'use strict';
@@ -19,6 +20,7 @@
   var pending=null;
   var busy=false;
   var history=[];
+  var visitorName='';
   var counter=0;
   var base=endpoint.split('?')[0];
 
@@ -76,6 +78,19 @@
     });
     return JSON.stringify(compact);
   }
+  function rememberVisitorName(question){
+    if(visitorName)return;
+    var m=String(question||'').match(/(?:^|\s)(?:me llamo|mi nombre es)\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,2})/i);
+    if(m){visitorName=m[1].trim().slice(0,60);return;}
+    // Cuando la respuesta anterior pidió el nombre, aceptar un nombre breve.
+    var last=history.length?history[history.length-1]:null;
+    if(last && last.role==='assistant' && /(?:c[oó]mo te llamas|cu[aá]l es tu nombre)/i.test(last.content)){
+      var q=String(question||'').trim();
+      if(/^[A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2}$/.test(q) && !/^(?:hola|gracias|no|si|sí|bien|perfecto)$/i.test(q)){
+        visitorName=q.slice(0,60);
+      }
+    }
+  }
   function setBusy(value){
     busy=value;
     input.readOnly=!!value;
@@ -89,12 +104,13 @@
     if(busy)return;
     var q=String(input.value||'').trim().slice(0,500);
     if(!q)return;
+    rememberVisitorName(q);
     input.value='';
     append(q,'question');
     var pendingAnswer=append('Consultando OpenAI…','answer');
     var previous=historyParam();
     setBusy(true);
-    ask({question:q,history:previous},60000).then(function(res){
+    ask({question:q,history:previous,visitorName:visitorName},90000).then(function(res){
       var reply=res&&res.ok&&typeof res.text==='string'&&res.text.trim()
         ?res.text.trim():String(res&&res.error||'No fue posible obtener una respuesta de OpenAI.');
       pendingAnswer.textContent=reply;
