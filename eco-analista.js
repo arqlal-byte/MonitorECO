@@ -56,7 +56,7 @@ function noMeasure(){
   ' No sería correcto afirmar que las aplicaciones están funcionando o fallando.';
 }
 function answerApp(def){
- if(!isFresh())return noMeasure();
+ if(def.key!=='dashboard'&&!isFresh())return noMeasure();
  var a=oneApp(def.key);
  if(def.key!=='dashboard')
    return def.name+' todavía no tiene una prueba funcional conectada al Monitor ECO. '+
@@ -65,9 +65,9 @@ function answerApp(def){
       'Hay alertas en fuentes relacionadas: '+a.sourceWarningKeys.join(', ')+'. Esto no demuestra que la app esté fallando.':
       'El estado de sus fuentes de Sheets, si se revisan, no sustituye una prueba de la aplicación.');
  if(!isDashboardFresh(a))
-   return 'El Dashboard Ejecutivo ECO está registrado, pero no hay una comprobación de su consulta ejecutiva vigente. '+
-     'La lectura correcta de Sheets no confirma que el Dashboard funcione. '+
-     'Recomendación: verificar la ejecución de verificarDashboardECO_Ahora en Monitor ECO.';
+   return 'El Dashboard Ejecutivo ECO no tiene una medición reciente de su consulta ejecutiva. '+
+     'Esto NO significa que esté desconectado: la comprobación anterior puede haber vencido. '+
+     'Recomendación: revisar el disparador periódico verificarDashboardECO_Ahora en Monitor ECO.';
  if(a.status==='unverified')
    return 'La comprobación del Dashboard sigue pendiente o sin autorización. '+
      reason(a.code)+
