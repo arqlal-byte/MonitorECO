@@ -4,15 +4,15 @@
    No consulta otros sistemas ni ejecuta escrituras. */
 (function(){
 'use strict';
-var box=document.getElementById('eco-chat-panel'),open=document.getElementById('eco-chat-open'),
-    close=document.getElementById('eco-chat-close'),form=document.getElementById('eco-chat-form'),
-    input=document.getElementById('eco-chat-input'),messages=document.getElementById('eco-chat-messages'),
+var box=document.getElementById('eco-chat-panel'),
+    form=document.getElementById('eco-chat-form'),
+    input=document.getElementById('eco-chat-input'),
+    messages=document.getElementById('eco-chat-messages'),
     stamp=document.getElementById('eco-chat-stamp'),
     welcome=document.getElementById('eco-assistant-welcome'),
     hero=document.getElementById('assistant-hero');
-if(!box||!open||!close||!form||!input||!messages)return;
+if(!box||!form||!input||!messages)return;
 var snapshot=window.ECO_MONITOR_PUBLIC_SNAPSHOT||null;
-var focusBefore=null;
 var apps=[
  {key:'evaluacion360',name:'Evaluación 360 ECO',terms:['evaluacion 360','360','evaluacion 2027']},
  {key:'autoevaluacion',name:'Autoevaluación ECO',terms:['autoevaluacion','autoevaluaciones']},
@@ -306,10 +306,12 @@ function updateWelcome(){
  return state;
 }
 function add(text,kind){
+ messages.hidden=false;
  var msg=document.createElement('div');
  msg.className='eco-chat-message eco-chat-'+kind;
  msg.textContent=String(text||'');
  messages.appendChild(msg);
+ while(messages.children.length>36)messages.removeChild(messages.firstChild);
  messages.scrollTop=messages.scrollHeight;
 }
 function send(question){
@@ -319,38 +321,19 @@ function send(question){
  add(reply(q),'answer');
  input.value='';
 }
-function openPanel(){
- focusBefore=document.activeElement;
- box.hidden=false;
- document.body.classList.add('eco-chat-visible');
- if(!messages.children.length){
-   add(updateWelcome().message,'answer');
-   add('Puedo explicar las mediciones técnicas del tablero, pero no comprobar funciones que el Monitor aún no supervisa.','answer');
- }
- input.focus();
-}
-function closePanel(){
- box.hidden=true;
- document.body.classList.remove('eco-chat-visible');
- if(focusBefore&&typeof focusBefore.focus==='function')focusBefore.focus();
-}
-open.addEventListener('click',openPanel);
-close.addEventListener('click',closePanel);
-box.addEventListener('click',function(e){if(e.target===box)closePanel();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!box.hidden)closePanel();});
-form.addEventListener('submit',function(e){e.preventDefault();send(input.value);});
-document.querySelectorAll('[data-eco-chat-ask]').forEach(function(b){
- b.addEventListener('click',function(){send(b.getAttribute('data-eco-chat-ask'));});
+form.addEventListener('submit',function(e){
+ e.preventDefault();
+ send(input.value);
 });
 window.ecoMonitorReceiveSnapshot=function(data){
  snapshot=data&&typeof data==='object'?data:null;
  updateWelcome();
- if(stamp)stamp.textContent=isFresh()?'Datos del '+datetime(snapshot.lastCheck):
+ if(stamp)stamp.textContent=isFresh()?'Mediciones del '+datetime(snapshot.lastCheck):
    'Sin medición vigente';
- var bot=document.querySelector('.eco-bot-stage');
- var caption=document.getElementById('eco-bot-caption');
- if(bot)bot.setAttribute('data-live',isFresh()?'true':'false');
- if(caption)caption.textContent=isFresh()?'DATOS VIGENTES':'EN ESPERA';
+ var visual=document.querySelector('.jarvis-visual');
+ var caption=document.getElementById('jarvis-caption');
+ if(visual)visual.setAttribute('data-live',isFresh()?'true':'false');
+ if(caption)caption.textContent=isFresh()?'VIGILANCIA ACTIVA':'CONSULTANDO ESTADO';
 };
 if(snapshot)window.ecoMonitorReceiveSnapshot(snapshot);
 else updateWelcome();

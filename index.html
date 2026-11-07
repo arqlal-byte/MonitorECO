@@ -186,6 +186,49 @@ body.eco-chat-visible{overflow:hidden}
  .assistant-hero .panel-title{font-size:11px}
 }
 
+
+/* Jarvis RH original integrado al centro de conexiones del monitor. */
+.network-board{display:flex;flex-direction:column}
+.network-topology{position:relative;flex:none;height:515px;isolation:isolate}
+.network-topology:after{content:"";position:absolute;z-index:1;left:50%;bottom:0;width:2px;height:110px;transform:translateX(-50%);pointer-events:none;background:linear-gradient(180deg,transparent,#40cbff99 54%,#6bffff);box-shadow:0 0 14px #21cbff88;animation:jarvisLink 3.4s ease-in-out infinite}
+.jarvis-dock{position:relative;z-index:7;isolation:isolate;background:radial-gradient(ellipse at 15% 12%,#09609a44,transparent 46%),linear-gradient(145deg,#061d38,#06162d 65%,#08223e);padding:20px clamp(14px,2vw,28px) 18px;border-top:1px solid #1389c9}
+.jarvis-dock:before{content:"";position:absolute;z-index:-1;top:0;left:9%;right:9%;height:2px;background:linear-gradient(90deg,transparent,#54f4ff,#0084ff,#54f4ff,transparent);box-shadow:0 0 14px #02bfff99;animation:jarvisLink 3.4s ease-in-out infinite}
+.jarvis-head{display:grid;grid-template-columns:clamp(118px,20%,176px) minmax(0,1fr);gap:clamp(12px,2vw,24px);align-items:center}
+.jarvis-visual{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.jarvis-visual img{display:block;width:100%;max-width:174px;height:auto;aspect-ratio:1;object-fit:contain;border-radius:50%;background:#000;box-shadow:0 0 0 1px #1dafff55,0 0 28px #09adff55;filter:drop-shadow(0 0 10px #0aa6ff77)}
+.jarvis-visual[data-live="true"] img{box-shadow:0 0 0 1px #2bddf755,0 0 30px #07d3ff88}
+#jarvis-caption{font-size:9px;color:#7caacf;letter-spacing:1.2px;margin-top:6px;font-weight:850;text-align:center}
+.jarvis-visual[data-live="true"] #jarvis-caption{color:#75ebdf}
+.jarvis-words{min-width:0}
+.jarvis-kicker{font-size:11px;color:#82e8ff;font-weight:900;letter-spacing:1.35px;margin-bottom:7px}
+.jarvis-dot{display:inline-block;background:#62d7fd;width:7px;height:7px;border-radius:50%;box-shadow:0 0 11px #2ef2f3;vertical-align:middle;margin-right:5px}
+.jarvis-separator{color:#427c9d;margin:0 4px}
+.jarvis-words .ai-signal{color:#92b7d5;font-size:9px;letter-spacing:1px;margin:0 0 6px}
+.jarvis-subtitle{font-size:11px;font-weight:650;color:#a3c8da;margin:0 0 6px}
+.jarvis-greeting{font-size:clamp(22px,2vw,32px);font-weight:820;line-height:1.3;letter-spacing:-.25px;color:#f4fbff;margin:0 0 12px;max-width:850px;text-shadow:0 0 17px #1aafff44}
+.jarvis-dock[data-status="ok"] .jarvis-greeting{color:#effffb}
+.jarvis-dock[data-status="warning"] .jarvis-greeting{color:#ffe7ae}
+.jarvis-dock[data-status="error"] .jarvis-greeting{color:#ffb9ba}
+.jarvis-detail{font-size:11px;line-height:1.5;color:#a4c8e4;margin:0;max-width:850px}
+.jarvis-console{margin:14px 0 0}
+.jarvis-compose{position:relative;min-width:0}
+.jarvis-compose input{width:100%;min-height:54px;padding:12px 18px;background:linear-gradient(120deg,#041324,#092849);border:1px solid #2896cc;border-radius:12px;outline:0;color:#fff;font-family:inherit;font-weight:600;font-size:16px;line-height:1.4;box-shadow:inset 0 0 18px #043762,0 0 12px #0779af29}
+.jarvis-compose input::placeholder{color:#aac8da;font-weight:500}
+.jarvis-compose input:focus{border-color:#78f2ff;outline:2px solid #0c9fdb;outline-offset:2px;box-shadow:inset 0 0 18px #04517a,0 0 18px #29bbee66}
+.jarvis-stamp{color:#81d7ea;font-size:10px;letter-spacing:.2px;margin-top:8px}
+.jarvis-note{color:#7e9ebc;font-size:10px;margin:7px 0 0;line-height:1.4}
+.jarvis-messages[hidden]{display:none!important}
+.jarvis-messages{display:flex;flex-direction:column;align-items:stretch;gap:8px;max-height:320px;overflow-y:auto;margin-top:11px;padding:11px;border:1px solid #14577f;border-radius:10px;background:#031429cf}
+.jarvis-messages .eco-chat-message{font-size:13px;line-height:1.6;white-space:pre-line;max-width:95%;overflow-wrap:anywhere}
+.jarvis-messages .eco-chat-answer{align-self:flex-start;background:#102d4f;border:1px solid #264f6f;border-radius:10px;padding:11px}
+.jarvis-messages .eco-chat-question{align-self:flex-end;background:#145582;border:1px solid #248eae;border-radius:10px;padding:11px}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@keyframes jarvisLink{0%,100%{opacity:.42}50%{opacity:1}}
+@media(max-width:1050px){.network-topology{height:530px}.jarvis-greeting{font-size:clamp(22px,2.45vw,30px)}}
+@media(max-width:680px){.network-topology{height:580px}.jarvis-dock{padding:17px 15px 17px}.jarvis-head{grid-template-columns:106px minmax(0,1fr);gap:11px}.jarvis-greeting{font-size:clamp(19px,4vw,26px)}.jarvis-visual img{max-width:106px}}
+@media(max-width:460px){.network-topology{height:640px}.jarvis-head{grid-template-columns:82px minmax(0,1fr);gap:9px;align-items:start}.jarvis-visual img{max-width:82px}.jarvis-greeting{font-size:20px;line-height:1.27}.jarvis-kicker{font-size:9px;letter-spacing:.65px}.jarvis-words .ai-signal{font-size:8px}#jarvis-caption{font-size:7px}.jarvis-dock{padding:12px 11px 15px}.jarvis-compose input{min-height:53px;padding:12px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){.network-topology:after,.jarvis-dock:before{animation:none}}
+
 </style>
 </head>
 <body>
@@ -195,48 +238,7 @@ body.eco-chat-visible{overflow:hidden}
   <div class="brand-title"><h1>MONITOR ECO</h1><p>CENTRO DE MONITOREO DEL ECOSISTEMA</p></div>
   <div class="header-right"><div class="demo-pill"><span class="light"></span> CONSULTANDO MEDICIONES</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
 </header>
-<section class="assistant-hero" id="assistant-hero" aria-label="Asistente de Monitor ECO">
-<article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Tu asistente de Monitor ECO <span class="aux">VIGILANCIA TÉCNICA</span></div><div class="ai-assistant-layout">
-    <div class="ai-assistant-info">
-      <div class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</div>
-      <h3 id="ai-title">Asistente contextual ECO</h3>
-      <p class="eco-assistant-welcome" id="eco-assistant-welcome" role="status" aria-live="polite">Estoy atento, cumpliendo mi trabajo. Estoy revisando las mediciones. ¿En qué puedo ayudarte?</p>
-      <p id="ai-description">Puedes preguntar por el estado de Sheets, Dashboard y las aplicaciones aún sin prueba.</p>
-      <p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p>
-    </div>
-    <div class="eco-bot-stage" title="Mascota visual del analista; no representa una IA autónoma">
-      <span class="eco-bot-orbit" aria-hidden="true"></span>
-      <svg class="eco-bot" viewBox="0 0 130 146" role="img" aria-label="Pequeño robot animado del Analista Monitor ECO">
-        <defs>
-          <linearGradient id="ecoBotShell" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#d6fbff"/><stop offset=".43" stop-color="#79dfff"/><stop offset="1" stop-color="#1676b9"/>
-          </linearGradient>
-          <linearGradient id="ecoBotHead" x1="0" y1="0" x2="0" y2="1">
-            <stop stop-color="#d7f8ff"/><stop offset=".55" stop-color="#5cc3f4"/><stop offset="1" stop-color="#1a6cb2"/>
-          </linearGradient>
-        </defs>
-        <g class="eco-bot-antenna"><path d="M65 22V13" stroke="#76eaff" stroke-width="5" stroke-linecap="round"/><circle cx="65" cy="11" r="6.5" fill="#36eaff" stroke="#dcffff" stroke-width="2"/></g>
-        <ellipse cx="65" cy="139" rx="36" ry="5" fill="#06bbf0" opacity=".24"/>
-        <g class="eco-bot-body">
-          <rect x="43" y="102" width="44" height="27" rx="16" fill="url(#ecoBotShell)" stroke="#d3faff" stroke-width="2"/>
-          <rect x="54" y="107" width="22" height="11" rx="5.5" fill="#083d70" stroke="#58e8fb" stroke-width="1.5"/>
-          <circle cx="65" cy="112.5" r="3" fill="#53fbd7" class="eco-bot-heart"/>
-          <path d="M41 112L32 119M89 112L98 119" stroke="#86e9ff" stroke-width="10" stroke-linecap="round"/>
-          <path d="M55 128L51 136M75 128L79 136" stroke="#7fcdf5" stroke-width="8" stroke-linecap="round"/>
-        </g>
-        <g class="eco-bot-head">
-          <rect x="22" y="24" width="86" height="79" rx="31" fill="url(#ecoBotHead)" stroke="#d6fcff" stroke-width="3"/>
-          <rect x="32" y="38" width="66" height="52" rx="21" fill="#08203e" stroke="#1cbfee" stroke-width="2.3"/>
-          <path d="M37 45Q54 35 89 46" stroke="#8defff" stroke-width="2" fill="none" opacity=".5"/>
-          <g class="eco-bot-eyes" fill="#7dffff"><ellipse cx="51" cy="62" rx="7" ry="9"/><ellipse cx="79" cy="62" rx="7" ry="9"/></g>
-          <path class="eco-bot-smile" d="M56 78Q65 84 74 78" fill="none" stroke="#70e8fa" stroke-width="2.6" stroke-linecap="round"/>
-          <circle cx="25" cy="70" r="5" fill="#54eaff"/><circle cx="105" cy="70" r="5" fill="#54eaff"/>
-        </g>
-      </svg>
-      <span class="eco-bot-caption" id="eco-bot-caption">EN ESPERA</span>
-    </div>
-  </div><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Hablar con el asistente</button><div class="ai-wave" aria-hidden="true"></div></article>
-</section>
+
 <div class="controls">
   <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
   <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
@@ -265,6 +267,7 @@ body.eco-chat-visible{overflow:hidden}
     <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">MUESTRA</span></div><div class="event-content"><div class="donut"><div class="donut-inner">8<small>eventos demo</small></div></div><div class="event-legend"><div class="legend-row"><i class="legend-dot" style="background:#39e27b"></i>Normal <b>72%</b></div><div class="legend-row"><i class="legend-dot" style="background:#16cbff"></i>Procesos <b>17%</b></div><div class="legend-row"><i class="legend-dot" style="background:#fbc54e"></i>Advertencias <b>7%</b></div><div class="legend-row"><i class="legend-dot" style="background:#f05b70"></i>Incidencias <b>4%</b></div></div></div></article>
   </div>
   <main class="network-board" aria-label="Topología visual interactiva de seis aplicaciones">
+    <div class="network-topology">
     <div class="network-label">◈ TOPOLOGÍA DEL <strong>ECOSISTEMA ECO</strong> · DEMO</div>
     <svg class="streams" viewBox="0 0 800 520" preserveAspectRatio="none" aria-hidden="true">
       <path class="stream-path" d="M400 255 L260 110 L145 110"/><path class="stream-flow" d="M400 255 L260 110 L145 110"/>
@@ -304,6 +307,32 @@ body.eco-chat-visible{overflow:hidden}
     <button class="appnode right1" data-app="1"><span class="node-icon">☷</span><span class="node-tag">PENDIENTE</span><div class="node-name">Autoevaluación ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
     <button class="appnode right2" data-app="3"><span class="node-icon">⚙</span><span class="node-tag">PENDIENTE</span><div class="node-name">Centro de Administración ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
     <button class="appnode right3" data-app="5"><span class="node-icon">♧</span><span class="node-tag">PENDIENTE</span><div class="node-name">Familia ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
+    </div>
+    <section class="jarvis-dock" id="assistant-hero" data-status="pending" aria-label="Consola integrada de Jarvis RH">
+      <div class="jarvis-head">
+        <div class="jarvis-visual" data-live="false" title="Jarvis RH, animación proporcionada para Monitor ECO">
+          <img src="./assets/Jarvis_RH.gif" alt="Jarvis RH, interfaz holográfica animada" width="414" height="414" loading="eager" decoding="async">
+          <span id="jarvis-caption">CONSULTANDO ESTADO</span>
+        </div>
+        <div class="jarvis-words">
+          <div class="jarvis-kicker"><span class="jarvis-dot" aria-hidden="true"></span> JARVIS RH <span class="jarvis-separator">/</span> CENTRO DE CONTROL</div>
+          <p class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</p>
+          <h3 id="ai-title" class="jarvis-subtitle">Analista contextual disponible</h3>
+          <p class="jarvis-greeting" id="eco-assistant-welcome" role="status" aria-live="polite">Estoy atento, cumpliendo mi trabajo. Estoy consultando las mediciones. ¿En qué puedo ayudarte?</p>
+          <p id="ai-description" class="jarvis-detail">Puedo responder sobre el estado de las seis aplicaciones y sus comprobaciones técnicas.</p>
+        </div>
+      </div>
+      <div class="jarvis-console" id="eco-chat-panel" role="region" aria-label="Conversación con Jarvis RH">
+        <form class="jarvis-compose" id="eco-chat-form">
+          <label class="sr-only" for="eco-chat-input">Escribe tu pregunta para Jarvis RH</label>
+          <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required placeholder="Escribe tu pregunta aquí y presiona Enter…" aria-label="Pregunta para Jarvis RH">
+          <button class="sr-only" type="submit">Enviar pregunta</button>
+        </form>
+        <div class="jarvis-stamp" id="eco-chat-stamp" role="status">Esperando medición vigente</div>
+        <div class="jarvis-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text" hidden></div>
+        <p class="jarvis-note">Respuestas basadas en mediciones técnicas. No es IA generativa y no modifica aplicaciones ni datos.</p>
+      </div>
+    </section>
   </main>
   <aside class="rail right-rail">
     <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">DEMO</span></div><div class="source-wrap"><div class="source-donut"><div><strong>12</strong><span>Fuentes demo</span></div></div><div class="source-counts"><span>● Operativas <b>12</b></span><span style="color:#ffdb80">▲ Advertencia <b>0</b></span><span style="color:#ff8493">✕ Error <b>0</b></span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
@@ -380,29 +409,8 @@ $('close-drawer').addEventListener('click',function(){$('drawer').hidden=true;})
 if(!window.ECO_MONITOR_ENDPOINT)states();
 })();
 </script>
-<div class="eco-chat-panel" id="eco-chat-panel" hidden role="presentation">
-  <section class="eco-chat-window" role="dialog" aria-modal="true" aria-labelledby="eco-chat-title" aria-describedby="eco-chat-intro">
-    <header class="eco-chat-header">
-      <div><h2 id="eco-chat-title">Analista Monitor ECO</h2><p id="eco-chat-intro">Consultas sobre lo que muestra el tablero; sin datos de otras aplicaciones.</p></div>
-      <button class="eco-chat-close" id="eco-chat-close" type="button" aria-label="Cerrar analista">×</button>
-    </header>
-    <div class="eco-chat-stamp" id="eco-chat-stamp" role="status">Esperando medición vigente</div>
-    <div class="eco-chat-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text"></div>
-    <div class="eco-chat-examples" aria-label="Preguntas de ejemplo">
-      <button type="button" data-eco-chat-ask="¿Cómo está el monitor?">Estado general</button>
-      <button type="button" data-eco-chat-ask="¿Por qué el Dashboard está sin conectar?">Dashboard</button>
-      <button type="button" data-eco-chat-ask="¿Qué anomalías hay y qué sugieres revisar?">Anomalías</button>
-      <button type="button" data-eco-chat-ask="¿Qué pasa con Mi Persona ECO?">Mi Persona</button>
-    </div>
-    <form class="eco-chat-form" id="eco-chat-form">
-      <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required aria-label="Pregunta para el analista" placeholder="Pregunta sobre el estado del monitor...">
-      <button class="eco-chat-send" type="submit">Enviar</button>
-    </form>
-    <p class="eco-chat-note">Interpretación contextual basada en mediciones publicadas. No es IA generativa; no modifica sistemas, no accede a datos personales ni conoce causas no verificadas.</p>
-  </section>
-</div>
 <script src="./monitor-live.js?v=20261107-familia1"></script>
-<script src="./eco-analista.js?v=20261107-asistente-top1"></script>
+<script src="./eco-analista.js?v=20261107-jarvis-integrado1"></script>
 
 </body>
 </html>
