@@ -168,6 +168,85 @@ function renderDashboard(data,stale){
  }
 }
 
+
+/* Comprobación independiente de Autoevaluación ECO V2.0.
+   Solo valida estructura/catálogo, NUNCA que las respuestas se guarden o que
+   una evaluación se complete. El límite de frescura corresponde al backend. */
+function autoevalDiagnostic(data){
+ if(!data||!Array.isArray(data.apps))return null;
+ return data.apps.find(function(a){return a&&a.key==='autoevaluacion'&&a.check==='CONSULTA_ESTRUCTURA';})||null;
+}
+function autoevalFresh(a){
+ if(!a||!a.checkedAt)return false;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000&&a.code!=='MEDICION_VENCIDA';
+}
+function verifiedAutoeval(data){
+ var a=autoevalDiagnostic(data);
+ return a&&autoevalFresh(a)&&['ok','warning','error'].indexOf(a.status)>=0?a:null;
+}
+function autoevalReason(a){
+ if(!a)return 'Todavía no se ha publicado una comprobación estructural de Autoevaluación. No implica que la aplicación esté desconectada.';
+ if(!autoevalFresh(a))return 'La última medición estructural de Autoevaluación está vencida. No demuestra una falla de la aplicación.';
+ var reasons={
+  SIN_CONFIGURACION:'Falta configurar la clave privada en el proyecto Monitor.',
+  SIN_RESPUESTA_VALIDA:'No se obtuvo una respuesta comprobable del diagnóstico de Autoevaluación.',
+  LECTURA_NO_DISPONIBLE:'El servicio no pudo completar la consulta estructural.',
+  ESTRUCTURA_NO_DISPONIBLE:'No se comprobó completamente la estructura esperada.',
+  CONSULTA_ESTRUCTURA_EXITOSA:'La estructura y el catálogo respondieron correctamente.'
+ };
+ return reasons[String(a.code||'')]||'La comprobación aún no permite determinar el estado de la estructura.';
+}
+function renderAutoevaluacion(data,stale){
+ var app=verifiedAutoeval(data),diagnostic=autoevalDiagnostic(data);
+ var d=verifiedDashboard(data);
+ var node=document.querySelector('.appnode[data-app="1"]');
+ var state=app?(app.status==='ok'?'Estructura comprobada':app.status==='warning'?'Estructura con advertencia':'Error de estructura'):
+   diagnostic&&autoevalFresh(diagnostic)?'Comprobación pendiente':'Sin medición reciente';
+ var tint=app?(app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a'):'#7f9caf';
+ if(node){
+  var dot=node.querySelector('.dot'),label=node.querySelector('.node-status'),
+      time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
+  if(dot){dot.classList.remove('warn','error');dot.style.background=tint;dot.style.boxShadow='none';}
+  if(label&&label.lastChild)label.lastChild.textContent=' '+state;
+  if(time)time.textContent=app&&app.latencyMs!=null?'Lectura: '+(asNum(app.latencyMs)/1000).toFixed(1)+' s':
+      diagnostic&&diagnostic.checkedAt?'Última prueba: '+new Date(diagnostic.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):
+      'Esperando prueba técnica';
+  if(tag)tag.textContent=app?'ESTRUCTURA':diagnostic?'SIN MEDICIÓN':'PENDIENTE';
+  node.style.borderColor=app?tint:'#256181';
+ }
+ var checked=[d,app].filter(Boolean);
+ var ok=checked.filter(function(a){return a.status==='ok';}).length;
+ var warnings=checked.filter(function(a){return a.status==='warning';}).length;
+ var failures=checked.filter(function(a){return a.status==='error';}).length;
+ $('healthy').textContent=String(ok);
+ $('warnings').textContent=String(warnings);
+ $('failures').textContent=String(failures);
+ var others=6-checked.length;
+ var footer=document.querySelector('.footer strong');
+ if(footer)footer.textContent='DASHBOARD: '+(d?(d.status==='ok'?'CONSULTA CORRECTA':'CON INCIDENCIA'):'SIN MEDICIÓN RECIENTE')+
+     ' · AUTOEVALUACIÓN: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN MEDICIÓN RECIENTE')+
+     ' · '+others+' APPS SIN COMPROBACIÓN VIGENTE';
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent+=' · Autoevaluación: '+(app?state.toLowerCase():'sin medición reciente (no implica desconexión)');
+ if(checked.length&&!stale){
+  var pill=document.querySelector('.demo-pill');
+  if(pill)pill.textContent='● DATOS REALES · SHEETS Y '+checked.length+' APP'+(checked.length>1?'S':'');
+  var mark=document.querySelector('.demo-watermark');
+  if(mark)mark.textContent='SHEETS Y '+checked.length+' PRUEBA'+(checked.length>1?'S':'')+' TÉCNICA'+(checked.length>1?'S':'')+' · '+others+' APPS SIN PRUEBA';
+ }
+ var activity=document.querySelector('.activity');
+ if(activity&&app)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+tint+';box-shadow:none"></span><span>Autoevaluación: '+esc(state)+
+   ' · '+esc(new Date(app.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}))+'</span></div>';
+ var aiDesc=$('ai-description');
+ if(aiDesc&&app){
+   var pre=aiDesc.textContent;
+   aiDesc.textContent=pre+' Autoevaluación: '+(app.status==='ok'?
+       'se comprobaron estructura y catálogo, no inicio de sesión ni guardado de respuestas.':
+       'la consulta estructural registró una incidencia pendiente de revisión.');
+ }
+}
+
 function apply(data){
  if(!data||data.schema!==1||!Array.isArray(data.sources)||!data.counts){neutral('Respuesta del monitor inválida');return;}
  if(!data.connected||!data.lastCheck){latest=null;neutral('Servicio accesible, pero todavía sin una medición registrada');return;}
@@ -268,6 +347,7 @@ function apply(data){
    if(info)info.textContent+=' · Dashboard: '+dashboardReason(diagnostic);
  }
  renderDashboard(data,stale);
+ renderAutoevaluacion(data,stale);
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
@@ -315,23 +395,34 @@ document.querySelectorAll('.appnode').forEach(function(node){
      0:'dashboard',1:'autoevaluacion',2:'evaluacion360',3:'administracion',4:'persona',5:'familia'
    }[i];
    var data=latest.apps.find(function(a){return a.key===app;});
-   var checked=app==='dashboard'?verifiedDashboard(latest):null;
+   var checked=app==='dashboard'?verifiedDashboard(latest):
+     app==='autoevaluacion'?verifiedAutoeval(latest):null;
    if(checked){
-     var detail=checked.status==='ok'?'La consulta ejecutiva respondió correctamente.':
-       checked.status==='warning'?'La consulta ejecutiva tiene una advertencia.':'La consulta ejecutiva presentó un error.';
+     var detail=app==='dashboard'?
+       (checked.status==='ok'?'La consulta ejecutiva respondió correctamente.':
+       checked.status==='warning'?'La consulta ejecutiva tiene una advertencia.':'La consulta ejecutiva presentó un error.'):
+       (checked.status==='ok'?'La estructura y el catálogo de Autoevaluación respondieron correctamente.':
+       checked.status==='warning'?'La estructura presenta una advertencia.':'La comprobación estructural reportó un error.');
      detail+='\nÚltima comprobación: '+new Date(checked.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'.';
      if(checked.latencyMs!=null)detail+='\nTiempo: '+(asNum(checked.latencyMs)/1000).toFixed(1)+' s.';
-     detail+='\nAlcance: solo consulta principal. No incluye inicio de sesión, informes, firmas, IA ni guardados.';
+     detail+=app==='dashboard'?'\nAlcance: solo consulta ejecutiva; no incluye login, informes, IA ni guardados.':
+       '\nAlcance: solo estructura de Sheets y catálogo; no incluye acceso de participantes, respuestas ni guardados.';
      $('drawer-desc').style.whiteSpace='pre-line';
-     openDrawer('Dashboard Ejecutivo ECO',detail,checked.status==='ok'?'CONSULTA CORRECTA':checked.status==='warning'?'ADVERTENCIA':'ERROR DE CONSULTA');
+     openDrawer(app==='dashboard'?'Dashboard Ejecutivo ECO':'Autoevaluación ECO V2.0',detail,
+       checked.status==='ok'?(app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
+       checked.status==='warning'?'ADVERTENCIA':'ERROR DE COMPROBACIÓN');
    }else{
-     var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):null;
+     var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):
+       app==='autoevaluacion'?autoevalDiagnostic(latest):null;
      var explanation=app==='dashboard'?
        dashboardReason(diagnostic)+'\nLos estados de Sheets no prueban por sí solos que el Dashboard funcione.':
+       app==='autoevaluacion'?
+       autoevalReason(diagnostic)+'\nEsta prueba no verifica ni modifica las respuestas de los líderes.':
        'Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.';
      $('drawer-desc').style.whiteSpace='pre-line';
      openDrawer(data?data.name:'Aplicación ECO',explanation,
-       app==='dashboard'?(diagnostic&&dashboardFresh(diagnostic)?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):'SIN PRUEBA FUNCIONAL');
+       app==='dashboard'?(diagnostic&&dashboardFresh(diagnostic)?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
+       app==='autoevaluacion'?'SIN MEDICIÓN RECIENTE':'SIN PRUEBA FUNCIONAL');
    }
  },true);
 });
