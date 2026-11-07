@@ -201,6 +201,10 @@ window.ecoMonitorReceiveSnapshot=function(data){
  snapshot=data&&typeof data==='object'?data:null;
  if(stamp)stamp.textContent=isFresh()?'Datos del '+datetime(snapshot.lastCheck):
    'Sin medición vigente';
+ var bot=document.querySelector('.eco-bot-stage');
+ var caption=document.getElementById('eco-bot-caption');
+ if(bot)bot.setAttribute('data-live',isFresh()?'true':'false');
+ if(caption)caption.textContent=isFresh()?'DATOS VIGENTES':'EN ESPERA';
 };
 if(snapshot)window.ecoMonitorReceiveSnapshot(snapshot);
 })();
