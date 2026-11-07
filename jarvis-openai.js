@@ -23,6 +23,10 @@
   var history=[];
   var visitorName='';
   var visitorKey='';
+  var feedbackPending=null;
+  var feedbackReady=false;
+  var feedbackOfferUsed=false;
+  var visitorTurns=0;
   var greeting='¡Hola! Soy JARVIS, colaboro con el equipo de Capital Humano. 😄 Qué gusto saludarte, ¿con quién tengo el gusto?';
   var counter=0;
   var base=endpoint.split('?')[0];
@@ -125,11 +129,27 @@
     append(q,'question');
     var pendingAnswer=append('Déjame revisarlo…','answer');
     var previous=historyParam();
+    visitorTurns++;
+    var params={question:q,history:previous,visitorName:visitorName,visitorKey:visitorKey};
+    if(feedbackReady){
+      if(feedbackPending)params.feedbackPending=JSON.stringify(feedbackPending);
+      if(visitorTurns>=3&&!feedbackOfferUsed&&!feedbackPending){
+        params.inviteFeedback='1';
+        feedbackOfferUsed=true;
+      }
+    }
     setBusy(true);
-    ask({question:q,history:previous,visitorName:visitorName,visitorKey:visitorKey},90000).then(function(res){
+    ask(params,90000).then(function(res){
       var reply=res&&res.ok&&typeof res.text==='string'&&res.text.trim()
         ?res.text.trim():String(res&&res.error||'No fue posible obtener una respuesta de OpenAI.');
       pendingAnswer.textContent=reply;
+      if(res&&res.ok&&feedbackReady){
+        if(res.clearFeedback===true)feedbackPending=null;
+        if(res.feedbackProposal&&typeof res.feedbackProposal==='object'){
+          feedbackPending=res.feedbackProposal;
+          feedbackOfferUsed=true;
+        }
+      }
       if(res&&res.ok){
         history.push({role:'user',content:q},{role:'assistant',content:reply});
         // El historial de mensajes sigue sólo en esta pestaña. Sheets guarda únicamente recuerdos consentidos.
@@ -147,6 +167,7 @@
   ask({mode:'ping'},14000).then(function(pong){
     if(!pong||pong.service!=='jarvis-eco-ai-v1'||pong.ready!==true)return;
     enabled=true;
+    feedbackReady=pong.feedbackReady===true;
     if(status)status.textContent='JARVIS ECO · Capital Humano';
     // Bienvenida nueva cada vez que se carga el chat; no presupone nombre ni identidad.
     append(greeting,'answer');
