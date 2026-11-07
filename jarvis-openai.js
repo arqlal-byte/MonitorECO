@@ -81,8 +81,8 @@
   }
   function historyParam(){
     // Últimos mensajes breves para mantener contexto sin hacer URLs enormes.
-    var compact=history.slice(-4).map(function(x){
-      return {role:x.role,content:String(x.content||'').slice(0,280)};
+    var compact=history.slice(-8).map(function(x){
+      return {role:x.role,content:String(x.content||'').slice(0,240)};
     });
     return JSON.stringify(compact);
   }
@@ -135,7 +135,7 @@
     if(feedbackReady){
       if(lastFeedbackId)params.lastFeedbackId=lastFeedbackId;
       if(feedbackPending)params.feedbackPending=JSON.stringify(feedbackPending);
-      if(visitorTurns>=3&&!feedbackOfferUsed&&!feedbackPending){
+      if(visitorTurns>=4&&!feedbackOfferUsed&&!feedbackPending&&/\b(?:eco|sistema|aplicaci[oó]n|evaluaci[oó]n|monitor|capital humano|recursos humanos|cultura|dashboard)\b/i.test(q)){
         params.inviteFeedback='1';
         feedbackOfferUsed=true;
       }
@@ -154,9 +154,13 @@
         }
       }
       if(res&&res.ok){
-        history.push({role:'user',content:q},{role:'assistant',content:reply});
-        // El historial de mensajes sigue sólo en esta pestaña. Sheets guarda únicamente recuerdos consentidos.
-        if(history.length>14)history=history.slice(-14);
+        if(res.resetConversation===true)history=[];
+        // Los recibos y borradores del correo NO son conversación con la IA.
+        // El estado del trámite se transporta por feedbackPending, independientemente.
+        if(res.conversationAction!=='correo'){
+          history.push({role:'user',content:q},{role:'assistant',content:reply});
+          if(history.length>16)history=history.slice(-16);
+        }
       }
     }).catch(function(){
       pendingAnswer.textContent='No fue posible contactar a OpenAI. Revisa la conexión y vuelve a intentarlo.';
