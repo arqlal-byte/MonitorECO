@@ -150,25 +150,25 @@ body.eco-chat-visible{overflow:hidden}
 <header class="header">
   <div class="corporate"><img src="./assets/eco-cocacola-oficial.png" alt="Logotipos corporativos oficiales de Embotelladora de Colima y Coca-Cola" width="520" height="130"></div>
   <div class="brand-title"><h1>MONITOR ECO</h1><p>CENTRO DE MONITOREO DEL ECOSISTEMA</p></div>
-  <div class="header-right"><div class="demo-pill"><span class="light"></span> MODO DEMOSTRACIÓN</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
+  <div class="header-right"><div class="demo-pill"><span class="light"></span> CONSULTANDO MEDICIONES</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
 </header>
 <div class="controls">
-  <div class="notice">◆ Vista conceptual animada · Sin datos reales ni conexiones activas</div>
+  <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
   <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
   <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
   <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
   <button class="ctrl danger" id="incident" aria-pressed="false">Simular incidencia</button>
   <button class="ctrl outline" id="pause">Pausar animaciones</button>
 </div>
-<section class="metrics" aria-label="Indicadores generales demostrativos">
-  <div class="kpi major"><div class="gauge"><span>DEMO</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">ESCENARIO ESTABLE</strong><div class="hint">Visualización de ejemplo</div></div></div>
+<section class="metrics" aria-label="Indicadores generales; sin resultados simulados mientras se conecta">
+  <div class="kpi major"><div class="gauge"><span>—</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">SIN DATOS CONFIRMADOS</strong><div class="hint">Esperando comprobación de fuentes</div></div></div>
   <div class="kpi"><div class="symbol">◈</div><div class="number">6</div><div class="hint">Aplicaciones objetivo</div></div>
-  <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">6</div><div class="hint">Operativas en la muestra</div></div>
-  <div class="kpi warn"><div class="symbol">⚠</div><div class="number" id="warnings">0</div><div class="hint">Advertencias demo</div></div>
-  <div class="kpi error"><div class="symbol">✕</div><div class="number" id="failures">0</div><div class="hint">Fallas demo</div></div>
-  <div class="kpi"><div class="symbol">▤</div><div class="number">12</div><div class="hint">Fuentes simuladas</div></div>
-  <div class="kpi"><div class="symbol">⚙</div><div class="number">8</div><div class="hint">Procesos simulados</div></div>
-  <div class="kpi"><div class="symbol">▥</div><div class="number">99.8%</div><div class="hint">Disponibilidad ejemplo</div></div>
+  <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">0</div><div class="hint">Aplicaciones verificadas</div></div>
+  <div class="kpi warn"><div class="symbol">⚠</div><div class="number" id="warnings">—</div><div class="hint">Advertencias por comprobar</div></div>
+  <div class="kpi error"><div class="symbol">✕</div><div class="number" id="failures">—</div><div class="hint">Fallas por comprobar</div></div>
+  <div class="kpi"><div class="symbol">▤</div><div class="number">—</div><div class="hint">Sheets sin medición</div></div>
+  <div class="kpi"><div class="symbol">⚙</div><div class="number">—</div><div class="hint">Procesos sin comprobar</div></div>
+  <div class="kpi"><div class="symbol">▥</div><div class="number">—</div><div class="hint">Disponibilidad no medida</div></div>
 </section>
 <section class="main-grid">
   <div class="rail left-rail">
@@ -213,12 +213,12 @@ body.eco-chat-visible{overflow:hidden}
       </svg>
       <div class="hub-base">CENTRO DE DATOS · ESQUEMA CONCEPTUAL</div>
     </div>
-    <button class="appnode left1" data-app="0"><span class="node-icon">▥</span><span class="node-tag">DEMO</span><div class="node-name">Dashboard Ejecutivo ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.2 s</div></button>
-    <button class="appnode left2" data-app="2"><span class="node-icon">♧</span><span class="node-tag">DEMO</span><div class="node-name">Evaluación 360 ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 4.1 s</div></button>
-    <button class="appnode left3" data-app="4"><span class="node-icon">♙</span><span class="node-tag">DEMO</span><div class="node-name">Mi Persona ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.0 s</div></button>
-    <button class="appnode right1" data-app="1"><span class="node-icon">☷</span><span class="node-tag">DEMO</span><div class="node-name">Autoevaluación ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 2.8 s</div></button>
-    <button class="appnode right2" data-app="3"><span class="node-icon">⚙</span><span class="node-tag">DEMO</span><div class="node-name">Centro de Administración ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.5 s</div></button>
-    <button class="appnode right3" data-app="5"><span class="node-icon">♧</span><span class="node-tag">DEMO</span><div class="node-name">Familia ECO</div><div class="node-status"><span class="dot"></span> Operativo (ejemplo)</div><div class="node-time">Respuesta: 3.4 s</div></button>
+    <button class="appnode left1" data-app="0"><span class="node-icon">▥</span><span class="node-tag">PENDIENTE</span><div class="node-name">Dashboard Ejecutivo ECO</div><div class="node-status"><span class="dot"></span> Sin medición reciente</div><div class="node-time">Esperando prueba automática</div></button>
+    <button class="appnode left2" data-app="2"><span class="node-icon">♧</span><span class="node-tag">PENDIENTE</span><div class="node-name">Evaluación 360 ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
+    <button class="appnode left3" data-app="4"><span class="node-icon">♙</span><span class="node-tag">PENDIENTE</span><div class="node-name">Mi Persona ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
+    <button class="appnode right1" data-app="1"><span class="node-icon">☷</span><span class="node-tag">PENDIENTE</span><div class="node-name">Autoevaluación ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
+    <button class="appnode right2" data-app="3"><span class="node-icon">⚙</span><span class="node-tag">PENDIENTE</span><div class="node-name">Centro de Administración ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
+    <button class="appnode right3" data-app="5"><span class="node-icon">♧</span><span class="node-tag">PENDIENTE</span><div class="node-name">Familia ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
   </main>
   <aside class="rail right-rail">
     <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">DEMO</span></div><div class="source-wrap"><div class="source-donut"><div><strong>12</strong><span>Fuentes demo</span></div></div><div class="source-counts"><span>● Operativas <b>12</b></span><span style="color:#ffdb80">▲ Advertencia <b>0</b></span><span style="color:#ff8493">✕ Error <b>0</b></span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
@@ -269,10 +269,11 @@ body.eco-chat-visible{overflow:hidden}
   </div><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Preguntar sobre los indicadores</button><div class="ai-wave" aria-hidden="true"></div></article>
   <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
 </section>
-<footer class="footer"><span>Monitor ECO V1 · Prototipo visual independiente · No conectado a Apps Script, Sheets ni Drive.</span><strong>NINGÚN ESTADO O NÚMERO CORRESPONDE A UNA VERIFICACIÓN REAL</strong></footer>
+<footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
 </div>
-<div class="demo-watermark">SIMULACIÓN VISUAL</div>
-<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · DEMOSTRACIÓN</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p><strong>Fuentes:</strong> Por verificar en la siguiente etapa.</p><p class="tagline">Para habilitar datos reales necesitaremos sus referencias vigentes y pruebas de lectura autorizadas.</p></div></div>
+<div class="demo-watermark">LECTURA PENDIENTE</div>
+<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p><strong>Fuentes:</strong> Según la medición más reciente disponible.</p><p class="tagline">Sin medición reciente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
+<script src="./config.js?v=20261106-conexion1"></script>
 <script>
 (function(){
 'use strict';
@@ -321,15 +322,15 @@ function states(){
  $('incident').setAttribute('aria-pressed',String(incident));
  chart();latency();
 }
-document.querySelectorAll('[data-range]').forEach(function(b){b.addEventListener('click',function(){range=b.getAttribute('data-range');chart();});});
-$('incident').addEventListener('click',function(){incident=!incident;states();});
+document.querySelectorAll('[data-range]').forEach(function(b){b.addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;range=b.getAttribute('data-range');chart();});});
+$('incident').addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;incident=!incident;states();});
 $('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';
 $('pause').addEventListener('click',function(){paused=!paused;document.body.classList.toggle('paused',paused);$('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';});
 function openDrawer(title,desc,state){$('drawer-title').textContent=title;$('drawer-desc').textContent=desc;$('drawer-state').textContent=state;$('drawer').hidden=false;$('close-drawer').focus();}
-document.querySelectorAll('.appnode').forEach(function(b){b.addEventListener('click',function(){var i=Number(b.getAttribute('data-app')),a=apps[i];openDrawer(a.name,a.note+'. El valor de respuesta ('+a.time.toFixed(1)+' s) es demostrativo.',incident&&i===2?'Advertencia simulada':'Operativo simulado');});});
-$('sources').addEventListener('click',function(){openDrawer('Datos y Drive','Las 12 fuentes indicadas en esta pantalla son un ejemplo visual. Todavía no existe un inventario de fuentes conectadas ni se han leído datos de las seis aplicaciones.','Sin conexión real');});
+document.querySelectorAll('.appnode').forEach(function(b){b.addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;var i=Number(b.getAttribute('data-app')),a=apps[i];openDrawer(a.name,a.note+'. El valor de respuesta ('+a.time.toFixed(1)+' s) es demostrativo.',incident&&i===2?'Advertencia simulada':'Operativo simulado');});});
+$('sources').addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;openDrawer('Datos y Drive','Las 12 fuentes indicadas en esta pantalla son un ejemplo visual. Todavía no existe un inventario de fuentes conectadas ni se han leído datos de las seis aplicaciones.','Sin conexión real');});
 $('close-drawer').addEventListener('click',function(){$('drawer').hidden=true;});$('drawer').addEventListener('click',function(e){if(e.target===$('drawer'))$('drawer').hidden=true;});document.addEventListener('keydown',function(e){if(e.key==='Escape')$('drawer').hidden=true;});
-states();
+if(!window.ECO_MONITOR_ENDPOINT)states();
 })();
 </script>
 <div class="eco-chat-panel" id="eco-chat-panel" hidden role="presentation">
@@ -353,8 +354,7 @@ states();
     <p class="eco-chat-note">Interpretación contextual basada en mediciones publicadas. No es IA generativa; no modifica sistemas, no accede a datos personales ni conoce causas no verificadas.</p>
   </section>
 </div>
-<script src="./config.js?v=20261106-conexion1"></script>
-<script src="./monitor-live.js?v=20261107-analista1"></script>
+<script src="./monitor-live.js?v=20261106-medicion2"></script>
 <script src="./eco-analista.js?v=20261107-avatar1"></script>
 
 </body>
