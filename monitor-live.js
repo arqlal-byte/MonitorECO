@@ -1,5 +1,5 @@
 /* Monitor ECO: adaptador visual para indicadores reales de Sheets.
-   No ejecuta escrituras ni pruebas funcionales sobre otras aplicaciones.
+   No ejecuta escrituras. Presenta solamente la prueba firmada de consulta ejecutiva del Dashboard; no certifica login, PDF, IA, firmas ni guardados.
    Si config.js no contiene un endpoint, conserva la demostración visual aprobada. */
 (function(){
 'use strict';
@@ -65,6 +65,66 @@ function neutral(message){
  if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Conexión con Apps Script configurada; consulta pendiente.</span><strong>NINGUNA APLICACIÓN TIENE PRUEBA FUNCIONAL CONECTADA</strong>';
  var incident=$('incident');if(incident){incident.disabled=true;incident.textContent='Simulación deshabilitada';}
  document.querySelectorAll('[data-range]').forEach(function(b){b.disabled=true;});
+}
+
+
+/* La comprobación del Dashboard es independiente de la revisión de Sheets.
+   Solo datos técnicos publicados por el backend privado; nunca credenciales ni resultados. */
+function verifiedDashboard(data){
+ if(!data||!Array.isArray(data.apps))return null;
+ var d=data.apps.find(function(a){return a&&a.key==='dashboard';});
+ if(!d||d.check!=='CONSULTA_EJECUTIVA'||['ok','warning','error'].indexOf(d.status)<0)return null;
+ var age=Date.now()-Date.parse(d.checkedAt||'');
+ return isFinite(age)&&age>=0&&age<=20*60*1000?d:null;
+}
+function renderDashboard(data,stale){
+ var app=verifiedDashboard(data);
+ if(!app)return; // Backend anterior o revisión no vigente: se conserva "Sin prueba".
+ var statusText=app.status==='ok'?'Consulta ejecutiva correcta':
+   app.status==='warning'?'Consulta con advertencia':'Error en consulta ejecutiva';
+ var accent=app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a';
+ var node=document.querySelector('.appnode[data-app="0"]');
+ if(node){
+   var dot=node.querySelector('.dot'),state=node.querySelector('.node-status');
+   var time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
+   if(dot){dot.classList.remove('warn','error');dot.style.background=accent;dot.style.boxShadow='none';}
+   if(state&&state.lastChild)state.lastChild.textContent=' '+statusText;
+   if(time)time.textContent=app.latencyMs==null?'Prueba técnica registrada':
+     'Respuesta: '+(asNum(app.latencyMs)/1000).toFixed(1)+' s';
+   if(tag)tag.textContent='CONSULTA';
+   node.style.borderColor=accent;
+ }
+ $('healthy').textContent=app.status==='ok'?'1':'0';
+ $('warnings').textContent=app.status==='warning'?'1':'0';
+ $('failures').textContent=app.status==='error'?'1':'0';
+ var kpis=document.querySelectorAll('.metrics>.kpi');
+ if(kpis.length>=5){
+   var hints=['Apps con consulta comprobada','Apps con consulta en advertencia','Apps con error de consulta'];
+   [2,3,4].forEach(function(n,i){var h=kpis[n].querySelector('.hint');if(h)h.textContent=hints[i];});
+ }
+ if(!stale){
+   var pill=document.querySelector('.demo-pill');
+   if(pill)pill.textContent='● DATOS REALES · DASHBOARD Y SHEETS';
+   var mark=document.querySelector('.demo-watermark');
+   if(mark)mark.textContent='SHEETS Y CONSULTA DASHBOARD: REALES · 5 APPS SIN PRUEBA';
+ }
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent+=' · Dashboard: '+statusText.toLowerCase();
+ var general=$('general-state');
+ if(!stale&&general&&general.textContent==='FUENTES SIN ALERTAS'&&app.status!=='ok')
+   general.textContent=app.status==='warning'?'DASHBOARD CON ADVERTENCIA':'DASHBOARD CON ERROR';
+ var activity=document.querySelector('.activity');
+ if(activity)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+accent+';box-shadow:none"></span><span>Dashboard: '+esc(statusText)+
+   ' · '+esc(new Date(app.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}))+'</span></div>';
+ var aiDesc=$('ai-description');
+ if(aiDesc)aiDesc.textContent=app.status==='ok'?
+   'Se comprobó la consulta ejecutiva del Dashboard. No incluye autenticación, informes, firmas, IA ni operaciones de guardado.':
+   'La consulta ejecutiva del Dashboard registró una incidencia. Esta verificación no determina su causa ni prueba otras funciones.';
+ var footer=document.querySelector('.footer');
+ if(footer){
+   var strong=footer.querySelector('strong');
+   if(strong)strong.textContent='DASHBOARD: SOLO CONSULTA EJECUTIVA '+(app.status==='ok'?'CORRECTA':app.status==='warning'?'CON ADVERTENCIA':'CON ERROR')+' · 5 APPS SIN PRUEBA';
+ }
 }
 
 function apply(data){
@@ -155,6 +215,7 @@ function apply(data){
  }
  var footer=document.querySelector('.footer');
  if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Metadatos de Sheets verificados por un proyecto independiente. Última lectura: '+esc(data.lastCheck||'sin datos')+'</span><strong>LAS SEIS APLICACIONES NO TIENEN PRUEBA FUNCIONAL CONECTADA</strong>';
+ renderDashboard(data,stale);
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
@@ -202,7 +263,18 @@ document.querySelectorAll('.appnode').forEach(function(node){
      0:'dashboard',1:'autoevaluacion',2:'evaluacion360',3:'administracion',4:'persona',5:'familia'
    }[i];
    var data=latest.apps.find(function(a){return a.key===app;});
-   openDrawer(data?data.name:'Aplicación ECO','Todavía no hay una comprobación funcional conectada para esta aplicación. Sus relaciones con Sheets son referencias documentales que necesitan cotejarse con el código vigente.','SIN PRUEBA FUNCIONAL');
+   var checked=app==='dashboard'?verifiedDashboard(latest):null;
+   if(checked){
+     var detail=checked.status==='ok'?'La consulta ejecutiva respondió correctamente.':
+       checked.status==='warning'?'La consulta ejecutiva tiene una advertencia.':'La consulta ejecutiva presentó un error.';
+     detail+='\nÚltima comprobación: '+new Date(checked.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'.';
+     if(checked.latencyMs!=null)detail+='\nTiempo: '+(asNum(checked.latencyMs)/1000).toFixed(1)+' s.';
+     detail+='\nAlcance: solo consulta principal. No incluye inicio de sesión, informes, firmas, IA ni guardados.';
+     $('drawer-desc').style.whiteSpace='pre-line';
+     openDrawer('Dashboard Ejecutivo ECO',detail,checked.status==='ok'?'CONSULTA CORRECTA':checked.status==='warning'?'ADVERTENCIA':'ERROR DE CONSULTA');
+   }else{
+     openDrawer(data?data.name:'Aplicación ECO','Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.','SIN PRUEBA FUNCIONAL');
+   }
  },true);
 });
 var sourceButton=$('sources');
