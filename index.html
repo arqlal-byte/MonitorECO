@@ -356,6 +356,57 @@ body.eco-chat-visible{overflow:hidden}
  .network-topology .appnode .node-status{font-size:9px}
 }
 
+
+/* 2026-11-07: restaurar ocho tarjetas compactas, sin tocar contenido ni mediciones */
+.compact-results{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:10px;
+ margin:10px 0;
+ align-items:stretch;
+}
+.compact-results>.report-panels,
+.compact-results>.bottom-grid,
+.compact-results .report-panels>.rail{
+ display:contents!important;
+}
+.compact-results .panel{
+ min-width:0;
+ width:100%;
+ min-height:0!important;
+ height:218px;
+ max-height:218px;
+ margin:0;
+ padding:11px 12px;
+ overflow:auto;
+ align-self:stretch;
+ scrollbar-width:thin;
+ scrollbar-color:#155b83 transparent;
+}
+.compact-results .panel-title{
+ font-size:11px;
+ gap:6px;
+ line-height:1.3;
+ flex-wrap:wrap;
+}
+.compact-results .panel-title .aux{font-size:9px;white-space:normal;text-align:right}
+.compact-results .source-wrap{flex-wrap:wrap;gap:7px}
+.compact-results .source-donut{width:72px;height:72px;flex:0 0 72px;border-width:8px}
+.compact-results .source-counts{flex:1 1 105px;gap:5px}
+.compact-results .process-list,
+.compact-results .activity{min-width:0}
+.compact-results .lat-row{grid-template-columns:minmax(64px,1fr) minmax(35px,1.25fr) 36px;gap:5px}
+.compact-results .lat-row span:first-child{overflow-wrap:anywhere;white-space:normal;line-height:1.25}
+.compact-results .daily{min-width:0}
+@media(max-width:960px){
+ .compact-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .compact-results .panel{height:210px;max-height:210px}
+}
+@media(max-width:560px){
+ .compact-results{grid-template-columns:1fr}
+ .compact-results .panel{height:auto;min-height:145px!important;max-height:265px}
+}
+
 </style>
 </head>
 <body>
@@ -448,6 +499,7 @@ body.eco-chat-visible{overflow:hidden}
   <div class="kpi"><div class="symbol">▥</div><div class="number">—</div><div class="hint">Disponibilidad no medida</div></div>
 </section>
 
+<div class="compact-results" aria-label="Resultados del monitoreo">
 <section class="report-panels" aria-label="Paneles de resultados del monitor">
   <div class="rail left-rail">
     <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">Sin medición</span></div>
@@ -468,6 +520,7 @@ body.eco-chat-visible{overflow:hidden}
   
   <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">SIN MEDICIÓN</span></div><div class="daily"><p>Sin información verificada</p></div></div></article>
 </section>
+</div>
 <footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
 <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
 </div>
