@@ -58,8 +58,8 @@ function neutral(message){
  var points=$('chart-points');if(points)points.innerHTML='';
  var days=$('chart-days');if(days)days.textContent='Esperando revisiones reales';
  var bars=$('incidence-bars');if(bars)bars.innerHTML='';
- var aiTitle=$('ai-title');if(aiTitle)aiTitle.textContent='IA todavía sin conectar';
- var aiDesc=$('ai-description');if(aiDesc)aiDesc.textContent='Aún no hay mediciones reales confirmadas.';
+ var aiTitle=$('ai-title');if(aiTitle)aiTitle.textContent='Analista contextual disponible';
+ var aiDesc=$('ai-description');if(aiDesc)aiDesc.textContent='Puedes preguntar por indicadores, pero aún no hay una medición vigente.';
  var daily=document.querySelector('.daily');if(daily)daily.innerHTML='<p style="color:#bcdaf1">Datos de actividad no conectados.</p>';
  var footer=document.querySelector('.footer');
  if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Conexión con Apps Script configurada; consulta pendiente.</span><strong>NINGUNA APLICACIÓN TIENE PRUEBA FUNCIONAL CONECTADA</strong>';
@@ -222,7 +222,7 @@ function apply(data){
      return '<div class="lat-row"><span title="'+esc(s.name)+'">'+esc(s.name.length>24?s.name.substring(0,23)+'…':s.name)+'</span><div class="lat-track"><span style="--w:'+Math.min(100,ms/5000*100).toFixed(1)+'%"></span></div><b>'+(ms/1000).toFixed(1)+' s</b></div>';
    }).join('');
  }
- $('ai-title').textContent='IA todavía sin conectar';
+ $('ai-title').textContent='Analista contextual disponible';
  $('ai-description').textContent=asNum(counts.error)>0?'El monitor detectó un problema de acceso o estructura en una fuente. Este resultado es una comprobación automática, no un diagnóstico de IA.':'Se comprobó únicamente el acceso y la estructura de los Sheets. El diagnóstico automático de causas y la IA se incorporarán en una etapa posterior.';
  document.querySelector('.ai-signal').textContent='✦ COMPROBACIONES AUTOMÁTICAS · SIN IA';
  var daily=document.querySelector('.daily');
@@ -316,7 +316,7 @@ document.querySelectorAll('.appnode').forEach(function(node){
 });
 var sourceButton=$('sources');
 if(sourceButton)sourceButton.addEventListener('click',showSources,true);
-window.ecoMonitorCallback=function(data){if(pending){clearTimeout(pending.timeout);pending.script.remove();pending=null;}apply(data);};
+window.ecoMonitorCallback=function(data){if(pending){clearTimeout(pending.timeout);pending.script.remove();pending=null;}window.ECO_MONITOR_PUBLIC_SNAPSHOT=data;apply(data);if(typeof window.ecoMonitorReceiveSnapshot==='function')window.ecoMonitorReceiveSnapshot(data);};
 function poll(){
  if(pending){clearTimeout(pending.timeout);pending.script.remove();pending=null;}
  var script=document.createElement('script');
