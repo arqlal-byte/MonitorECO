@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#06152e">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Monitor ECO — Centro de Monitoreo [Demo]</title>
+<title>Monitor ECO — Centro de Monitoreo</title>
 <style>
 :root{color-scheme:dark;--bg:#030b19;--surface:#071a36;--surface2:#0a2445;--line:#087cc8;--cyan:#2cdbff;--ice:#bdeaff;--text:#e7f6ff;--muted:#8caaca;--green:#45f377;--yellow:#ffcc48;--red:#ff607a}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;min-width:320px}
@@ -243,7 +243,7 @@ $('close-drawer').addEventListener('click',function(){$('drawer').hidden=true;})
 states();
 })();
 </script>
-<script src="./config.js"></script>
-<script src="./monitor-live.js"></script>
+<script src="./config.js?v=20261106-conexion1"></script>
+<script src="./monitor-live.js?v=20261106-conexion1"></script>
 </body>
 </html>
