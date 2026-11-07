@@ -346,6 +346,15 @@ function verifiedServicio(data){
  var a=servicioDiagnostic(data);
  return a&&servicioFresh(a)&&['ok','warning','error'].indexOf(a.status)>=0?a:null;
 }
+/** Prueba individual limitada: no implica login, lectura con sesión ni guardado. */
+function verifiedIndividual(data,key){
+ if(!data||!Array.isArray(data.apps))return null;
+ var a=data.apps.find(function(x){return x&&x.key===key;});
+ if(!a||a.check!=='CONSULTA_TECNICA_LIMITADA'||a.code==='MEDICION_VENCIDA'||
+    !a.checkedAt||['ok','warning','error'].indexOf(a.status)<0)return null;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000?a:null;
+}
 function servicioReason(a){
  if(!a)return 'Todavía no se ha publicado una medición del Servicio de Datos en Monitor ECO. No significa que el servicio esté desconectado.';
  if(!servicioFresh(a))return 'La medición del Servicio de Datos ya no está vigente. Esto no demuestra que Centro o Mi Persona estén desconectadas.';
@@ -384,21 +393,50 @@ function renderServicioDatos(data){
    if(!node)return;
    var dot=node.querySelector('.dot'),status=node.querySelector('.node-status');
    var time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
-   if(dot){dot.classList.remove('warn','error');dot.style.background=app?tint:'#7f9caf';dot.style.boxShadow='none';}
-   if(status&&status.lastChild)status.lastChild.textContent=app?
-     (app.status==='ok'?' Conexión al Servicio de Datos comprobada':' Servicio de Datos con incidencia'):
+   var individual=verifiedIndividual(data,i===3?'administracion':'persona');
+   var accent=individual?(individual.status==='ok'?'#43ed80':individual.status==='warning'?'#ffcc48':'#ff607a'):
+     (app?tint:'#7f9caf');
+   if(dot){dot.classList.remove('warn','error');dot.style.background=accent;dot.style.boxShadow='none';}
+   if(status&&status.lastChild)status.lastChild.textContent=individual?
+     (individual.status==='ok'?' Lectura técnica comprobada':individual.status==='warning'?' Lectura con advertencia':' Prueba técnica con error'):
+     app?(app.status==='ok'?' Conexión al Servicio de Datos comprobada':' Servicio de Datos con incidencia'):
      ' Servicio de Datos sin medición reciente';
-   if(time)time.textContent='Funciones propias pendientes de verificar';
-   if(tag)tag.textContent=app?(app.status==='ok'?'SERVICIO OK':'SERVICIO ALERTA'):'SIN MEDICIÓN';
-   node.style.borderColor=app&&app.status==='ok'?'#267f78':'#256181';
+   if(time)time.textContent=individual?'Sesiones y guardados sin probar':'Funciones propias pendientes de verificar';
+   if(tag)tag.textContent=individual?'LECTURA PARCIAL':app?(app.status==='ok'?'SERVICIO OK':'SERVICIO ALERTA'):'SIN MEDICIÓN';
+   node.style.borderColor=individual?accent:app&&app.status==='ok'?'#267f78':'#256181';
  });
  var footer=document.querySelector('.footer strong');
- if(footer)footer.textContent+=' · SERVICIO COMPARTIDO: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN PRUEBA VIGENTE');
+ var tested=[verifiedDashboard(data),verifiedAutoeval(data),verifiedEvaluacion360(data),
+   verifiedIndividual(data,'administracion'),verifiedIndividual(data,'persona')].filter(Boolean);
+ var individuals=[verifiedIndividual(data,'administracion'),verifiedIndividual(data,'persona')].filter(Boolean);
+ if(individuals.length){
+   $('healthy').textContent=String(tested.filter(function(a){return a.status==='ok';}).length);
+   $('warnings').textContent=String(tested.filter(function(a){return a.status==='warning';}).length);
+   $('failures').textContent=String(tested.filter(function(a){return a.status==='error';}).length);
+   var kpis=document.querySelectorAll('.metrics>.kpi');
+   if(kpis.length>=5)[2,3,4].forEach(function(n){var h=kpis[n].querySelector('.hint');if(h)h.textContent='Aplicaciones con comprobación técnica limitada';});
+   var mode=document.querySelector('.demo-pill');
+   if(mode)mode.textContent='● DATOS REALES · '+tested.length+' PRUEBAS TÉCNICAS';
+   var mark=document.querySelector('.demo-watermark');
+   if(mark)mark.textContent='SHEETS + '+tested.length+' PRUEBAS TÉCNICAS · '+(6-tested.length)+' APPS SIN MEDICIÓN PROPIA';
+ }
+ if(footer){
+   footer.textContent='MONITOREO: '+tested.length+' PRUEBAS TÉCNICAS VIGENTES · '+(6-tested.length)+
+     ' APPS SIN PRUEBA PROPIA · SERVICIO COMPARTIDO: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN PRUEBA VIGENTE');
+ }
  var activity=document.querySelector('.activity');
  if(activity&&app)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+tint+';box-shadow:none"></span><span>Servicio de Datos: '+esc(condition)+
-  ' · '+esc(stamp)+' · 2 aplicaciones dependientes (sin prueba funcional)</span></div>';
+  ' · '+esc(stamp)+' · 2 aplicaciones dependientes</span></div>';
+ ['administracion','persona'].forEach(function(key){
+   var x=verifiedIndividual(data,key);
+   if(activity&&x)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+
+     (x.status==='ok'?'#43ed80':x.status==='warning'?'#ffcc48':'#ff607a')+
+     ';box-shadow:none"></span><span>'+esc(key==='administracion'?'Centro de Administración':'Mi Persona')+
+     ': '+esc(x.status==='ok'?'lectura y control de acceso correctos':'incidencia en prueba parcial')+
+     ' · '+esc(new Date(x.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}))+'</span></div>';
+ });
  var notice=document.querySelector('.notice');
- if(notice)notice.textContent+=' · Servicio de Datos: '+condition.toLowerCase()+'; Centro y Mi Persona sin prueba funcional.';
+ if(notice)notice.textContent+=' · Servicio de Datos: '+condition.toLowerCase()+'; las pruebas de Centro y Mi Persona son parciales (sin login ni guardados).';
 }
 
 function apply(data){
@@ -541,6 +579,8 @@ function openDrawer(title,body,state){
  }
  if(source)source.textContent=stateText.indexOf('SERVICIO DE DATOS')===0?
    'Fuente: Servicio de Datos ECO · comprobación estructural firmada.':
+   stateText.indexOf('CONSULTA TÉCNICA PARCIAL')===0?
+   'Fuente: Servicio de Datos ECO · lectura de catálogo y control de acceso, sin sesión real.':
    'Fuente: Mediciones técnicas publicadas por Monitor ECO.';
  $('drawer').hidden=false;$('close-drawer').focus();
 }
@@ -563,9 +603,14 @@ document.querySelectorAll('.appnode').forEach(function(node){
    var data=latest.apps.find(function(a){return a.key===app;});
    var checked=app==='dashboard'?verifiedDashboard(latest):
      app==='autoevaluacion'?verifiedAutoeval(latest):
-     app==='evaluacion360'?verifiedEvaluacion360(latest):null;
+     app==='evaluacion360'?verifiedEvaluacion360(latest):
+     (app==='administracion'||app==='persona')?verifiedIndividual(latest,app):null;
    if(checked){
-     var detail=app==='dashboard'?
+     var detail=(app==='administracion'||app==='persona')?
+       (checked.status==='ok'?'Se comprobó lectura real del catálogo de actividades, mapeo de campos y rechazo de credenciales sin sesión.':
+       checked.status==='warning'?'La prueba técnica parcial presentó advertencia.':
+       'La prueba técnica parcial encontró una incidencia. Consultar registros del Servicio de Datos.'):
+       app==='dashboard'?
        (checked.status==='ok'?'La consulta ejecutiva respondió correctamente.':
        checked.status==='warning'?'La consulta ejecutiva tiene una advertencia.':'La consulta ejecutiva presentó un error.'):
        app==='evaluacion360'?
@@ -576,13 +621,14 @@ document.querySelectorAll('.appnode').forEach(function(node){
        checked.status==='warning'?'La estructura presenta una advertencia.':'La comprobación estructural reportó un error.');
      detail+='\nÚltima comprobación: '+new Date(checked.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'.';
      if(checked.latencyMs!=null)detail+='\nTiempo: '+(asNum(checked.latencyMs)/1000).toFixed(1)+' s.';
-     detail+=app==='dashboard'?'\nAlcance: solo consulta ejecutiva; no incluye login, informes, IA ni guardados.':
+     detail+=(app==='administracion'||app==='persona')?'\nAlcance: prueba técnica limitada; NO valida login real, sesiones, consultas con sesión, cambios de RH, confirmación, evidencias ni guardados.':
+       app==='dashboard'?'\nAlcance: solo consulta ejecutiva; no incluye login, informes, IA ni guardados.':
        app==='evaluacion360'?'\nAlcance: solo estructura del ciclo activo, diccionario y encabezados. No verifica evaluaciones, guardados ni promedios nocturnos.':
        '\nAlcance: solo estructura de Sheets y catálogo; no incluye acceso de participantes, respuestas ni guardados.';
      $('drawer-desc').style.whiteSpace='pre-line';
-     openDrawer(app==='dashboard'?'Dashboard Ejecutivo ECO':
+     openDrawer((app==='administracion'||app==='persona')?data.name:app==='dashboard'?'Dashboard Ejecutivo ECO':
        app==='evaluacion360'?'Evaluación 360 ECO':'Autoevaluación ECO V2.0',detail,
-       checked.status==='ok'?(app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
+       checked.status==='ok'?((app==='administracion'||app==='persona')?'CONSULTA TÉCNICA PARCIAL CORRECTA':app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
        checked.status==='warning'?'ADVERTENCIA':'ERROR DE COMPROBACIÓN');
    }else{
      var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):
