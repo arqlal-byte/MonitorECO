@@ -28,7 +28,7 @@
   var feedbackReady=false;
   var feedbackOfferUsed=false;
   var visitorTurns=0;
-  var greeting='¡Hola! Soy JARVIS, colaboro con el equipo de Capital Humano. 😄 Qué gusto saludarte, ¿con quién tengo el gusto?';
+  var greeting='¡Hola! Soy JARVIS, del equipo de Capital Humano. 😄 Me gusta conocer a quienes pasan por aquí. ¿Cómo te llamas? Podemos platicar de lo que quieras o echarle un vistazo a cualquier tema de ECO.';
   var counter=0;
   var base=endpoint.split('?')[0];
 
@@ -119,7 +119,18 @@
     if(status)status.textContent=value?'JARVIS está preparando su respuesta…':'JARVIS ECO · Capital Humano';
   }
   function onSubmit(event){
-    if(!enabled)return; // Conserva intacto el asistente anterior hasta el despliegue real.
+    // No permitir que el asistente antiguo simule una respuesta de IA cuando el backend falla.
+    if(!enabled){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      var attempted=String(input.value||'').trim().slice(0,500);
+      if(attempted){
+        input.value='';
+        append(attempted,'question');
+        append('Todavía no consigo conectar mi conversación. Prueba recargar la página; prefiero avisarte que darte una respuesta inventada.','answer');
+      }
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     if(busy)return;
@@ -170,18 +181,24 @@
       messages.scrollTop=messages.scrollHeight;
     });
   }
-  // No interfiere con el código contextual existente mientras el servidor no esté listo.
+  // La bienvenida no depende de las mediciones del monitor ni de un ping de servidor.
+  append(greeting,'answer');
+  history.push({role:'assistant',content:greeting});
+  // Siempre interceptar el formulario: nunca presentar las respuestas rígidas del bot antiguo
+  // como si procedieran de JARVIS. Los estados y gráficas del monitor quedan independientes.
+  form.addEventListener('submit',onSubmit,true);
+  function showConnectionError(){
+    if(status)status.textContent='JARVIS ECO · conversación desconectada';
+    append('No logré conectar mi conversación por ahora. El monitor sigue disponible; puedes recargar esta página para reintentar.','answer');
+  }
   ask({mode:'ping'},14000).then(function(pong){
-    if(!pong||pong.service!=='jarvis-eco-ai-v1'||pong.ready!==true)return;
+    // Compatibilidad con despliegues anteriores y con el Code.gs nuevo.
+    if(!pong||!/^jarvis-eco-ai-v[12]$/.test(String(pong.service||''))||pong.ready!==true){
+      showConnectionError();
+      return;
+    }
     enabled=true;
     feedbackReady=pong.feedbackReady===true;
     if(status)status.textContent='JARVIS ECO · Capital Humano';
-    // Bienvenida nueva cada vez que se carga el chat; no presupone nombre ni identidad.
-    append(greeting,'answer');
-    history.push({role:'assistant',content:greeting});
-    // Captura antes del listener anterior, conservando el resto de sus funciones.
-    form.addEventListener('submit',onSubmit,true);
-  }).catch(function(){
-    // Apps Script aún no desplegado: queda el asistente anterior sin cambios.
-  });
+  }).catch(showConnectionError);
 })();
