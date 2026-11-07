@@ -247,6 +247,88 @@ function renderAutoevaluacion(data,stale){
  }
 }
 
+
+/* Evaluación 360: verificación firmada de estructura del ciclo activo.
+   No acredita captura, guardado, identidad de evaluadores, cálculo nocturno
+   ni funcionamiento integral de la aplicación. */
+function evaluacion360Diagnostic(data){
+ if(!data||!Array.isArray(data.apps))return null;
+ return data.apps.find(function(a){return a&&a.key==='evaluacion360'&&a.check==='CONSULTA_ESTRUCTURA';})||null;
+}
+function evaluacion360Fresh(a){
+ if(!a||!a.checkedAt||a.code==='MEDICION_VENCIDA')return false;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000;
+}
+function verifiedEvaluacion360(data){
+ var a=evaluacion360Diagnostic(data);
+ return a&&evaluacion360Fresh(a)&&['ok','warning','error'].indexOf(a.status)>=0?a:null;
+}
+function evaluacion360Reason(a){
+ if(!a)return 'El Monitor todavía no publica una comprobación estructural de Evaluación 360. Esto no prueba desconexión ni pérdida de datos.';
+ if(!evaluacion360Fresh(a))return 'La última revisión estructural de Evaluación 360 está vencida o sin fecha válida. No demuestra una falla del cuestionario.';
+ var codes={
+  SIN_CONFIGURACION:'Falta configurar la clave privada en el proyecto Monitor ECO.',
+  NO_AUTORIZADO:'La comprobación fue rechazada por el servicio de Evaluación 360; revisar la clave privada en ambos proyectos.',
+  SIN_RESPUESTA_VALIDA:'El Monitor no recibió una respuesta válida del servicio de Evaluación 360.',
+  CONSULTA_FALLIDA:'La revisión estructural de Evaluación 360 reportó un error. Consultar los registros técnicos de esa aplicación.',
+  CONSULTA_ESTRUCTURA_EXITOSA:'Las hojas, encabezados y las 60 preguntas del ciclo activo se comprobaron correctamente.'
+ };
+ return codes[String(a.code||'')]||'La revisión todavía no produjo un estado concluyente; código: '+
+   String(a.code||'SIN_CODIGO').replace(/[^A-Z0-9_]/g,'').slice(0,40)+'.';
+}
+function renderEvaluacion360(data,stale){
+ var app=verifiedEvaluacion360(data),diagnostic=evaluacion360Diagnostic(data);
+ var node=document.querySelector('.appnode[data-app="2"]');
+ var labelText=app?(app.status==='ok'?'Estructura comprobada':app.status==='warning'?'Estructura con advertencia':'Error de estructura'):
+   diagnostic&&evaluacion360Fresh(diagnostic)?'Comprobación pendiente':'Sin medición reciente';
+ var tint=app?(app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a'):'#7f9caf';
+ if(node){
+   var dot=node.querySelector('.dot'),state=node.querySelector('.node-status'),
+       time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
+   if(dot){dot.classList.remove('warn','error');dot.style.background=tint;dot.style.boxShadow='none';}
+   if(state&&state.lastChild)state.lastChild.textContent=' '+labelText;
+   if(time)time.textContent=app&&app.latencyMs!=null?'Lectura: '+(asNum(app.latencyMs)/1000).toFixed(1)+' s':
+     diagnostic&&diagnostic.checkedAt?'Última prueba: '+new Date(diagnostic.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):
+     'Esperando prueba técnica';
+   if(tag)tag.textContent=app?'ESTRUCTURA':diagnostic?'SIN MEDICIÓN':'PENDIENTE';
+   node.style.borderColor=app?tint:'#256181';
+ }
+ var checked=[verifiedDashboard(data),verifiedAutoeval(data),app].filter(Boolean);
+ var ok=checked.filter(function(a){return a.status==='ok';}).length;
+ var warnings=checked.filter(function(a){return a.status==='warning';}).length;
+ var failures=checked.filter(function(a){return a.status==='error';}).length;
+ $('healthy').textContent=String(ok);
+ $('warnings').textContent=String(warnings);
+ $('failures').textContent=String(failures);
+ var kpis=document.querySelectorAll('.metrics>.kpi');
+ if(kpis.length>=5){
+  var hints=['Aplicaciones con prueba técnica correcta','Aplicaciones con advertencia técnica','Aplicaciones con error técnico'];
+  [2,3,4].forEach(function(n,i){var h=kpis[n].querySelector('.hint');if(h)h.textContent=hints[i];});
+ }
+ var pendingApps=6-checked.length;
+ var summary=document.querySelector('.footer strong');
+ if(summary)summary.textContent='DASHBOARD: '+(verifiedDashboard(data)?'CONSULTA VIGENTE':'SIN CONSULTA VIGENTE')+
+   ' · AUTOEVALUACIÓN: '+(verifiedAutoeval(data)?'PRUEBA VIGENTE':'SIN MEDICIÓN VIGENTE')+
+   ' · EVALUACIÓN 360: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN MEDICIÓN VIGENTE')+
+   ' · '+pendingApps+' APPS SIN PRUEBA VIGENTE';
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent+=' · Evaluación 360: '+(app?labelText.toLowerCase():'sin medición reciente (no implica desconexión)');
+ if(checked.length&&!stale){
+  var pill=document.querySelector('.demo-pill');
+  if(pill)pill.textContent='● DATOS REALES · '+checked.length+' PRUEBAS TÉCNICAS';
+  var mark=document.querySelector('.demo-watermark');
+  if(mark)mark.textContent='SHEETS + '+checked.length+' PRUEBAS LIMITADAS · '+pendingApps+' APPS SIN PRUEBA VIGENTE';
+ }
+ var activity=document.querySelector('.activity');
+ if(activity&&app)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+tint+';box-shadow:none"></span><span>Evaluación 360: '+
+   esc(labelText)+' · '+esc(new Date(app.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}))+'</span></div>';
+ var aiDesc=$('ai-description');
+ if(aiDesc&&app)aiDesc.textContent+=' Evaluación 360: '+(app.status==='ok'?
+   'estructura, encabezados y 60 preguntas revisados; no se prueba el guardado de respuestas ni el cálculo nocturno.':
+   'comprobación estructural con incidencia técnica, pendiente de revisar.');
+}
+
 function apply(data){
  if(!data||data.schema!==1||!Array.isArray(data.sources)||!data.counts){neutral('Respuesta del monitor inválida');return;}
  if(!data.connected||!data.lastCheck){latest=null;neutral('Servicio accesible, pero todavía sin una medición registrada');return;}
@@ -348,6 +430,7 @@ function apply(data){
  }
  renderDashboard(data,stale);
  renderAutoevaluacion(data,stale);
+ renderEvaluacion360(data,stale);
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
@@ -396,33 +479,45 @@ document.querySelectorAll('.appnode').forEach(function(node){
    }[i];
    var data=latest.apps.find(function(a){return a.key===app;});
    var checked=app==='dashboard'?verifiedDashboard(latest):
-     app==='autoevaluacion'?verifiedAutoeval(latest):null;
+     app==='autoevaluacion'?verifiedAutoeval(latest):
+     app==='evaluacion360'?verifiedEvaluacion360(latest):null;
    if(checked){
      var detail=app==='dashboard'?
        (checked.status==='ok'?'La consulta ejecutiva respondió correctamente.':
        checked.status==='warning'?'La consulta ejecutiva tiene una advertencia.':'La consulta ejecutiva presentó un error.'):
+       app==='evaluacion360'?
+       (checked.status==='ok'?'Se comprobó la estructura de las hojas, encabezados y las 60 preguntas del ciclo activo.':
+       checked.status==='warning'?'La revisión de estructura de Evaluación 360 registró una advertencia.':
+       'La revisión estructural de Evaluación 360 reportó un error.'):
        (checked.status==='ok'?'La estructura y el catálogo de Autoevaluación respondieron correctamente.':
        checked.status==='warning'?'La estructura presenta una advertencia.':'La comprobación estructural reportó un error.');
      detail+='\nÚltima comprobación: '+new Date(checked.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'.';
      if(checked.latencyMs!=null)detail+='\nTiempo: '+(asNum(checked.latencyMs)/1000).toFixed(1)+' s.';
      detail+=app==='dashboard'?'\nAlcance: solo consulta ejecutiva; no incluye login, informes, IA ni guardados.':
+       app==='evaluacion360'?'\nAlcance: solo estructura del ciclo activo, diccionario y encabezados. No verifica evaluaciones, guardados ni promedios nocturnos.':
        '\nAlcance: solo estructura de Sheets y catálogo; no incluye acceso de participantes, respuestas ni guardados.';
      $('drawer-desc').style.whiteSpace='pre-line';
-     openDrawer(app==='dashboard'?'Dashboard Ejecutivo ECO':'Autoevaluación ECO V2.0',detail,
+     openDrawer(app==='dashboard'?'Dashboard Ejecutivo ECO':
+       app==='evaluacion360'?'Evaluación 360 ECO':'Autoevaluación ECO V2.0',detail,
        checked.status==='ok'?(app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
        checked.status==='warning'?'ADVERTENCIA':'ERROR DE COMPROBACIÓN');
    }else{
      var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):
-       app==='autoevaluacion'?autoevalDiagnostic(latest):null;
+       app==='autoevaluacion'?autoevalDiagnostic(latest):
+       app==='evaluacion360'?evaluacion360Diagnostic(latest):null;
      var explanation=app==='dashboard'?
        dashboardReason(diagnostic)+'\nLos estados de Sheets no prueban por sí solos que el Dashboard funcione.':
        app==='autoevaluacion'?
        autoevalReason(diagnostic)+'\nEsta prueba no verifica ni modifica las respuestas de los líderes.':
+       app==='evaluacion360'?
+       evaluacion360Reason(diagnostic)+'\nLa consulta no lee ni modifica evaluaciones individuales.':
        'Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.';
      $('drawer-desc').style.whiteSpace='pre-line';
      openDrawer(data?data.name:'Aplicación ECO',explanation,
        app==='dashboard'?(diagnostic&&dashboardFresh(diagnostic)?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
-       app==='autoevaluacion'?'SIN MEDICIÓN RECIENTE':'SIN PRUEBA FUNCIONAL');
+       app==='autoevaluacion'||app==='evaluacion360'?
+       (diagnostic&&((app==='autoevaluacion'?autoevalFresh:evaluacion360Fresh)(diagnostic))?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
+       'SIN PRUEBA FUNCIONAL');
    }
  },true);
 });
