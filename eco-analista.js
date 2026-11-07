@@ -38,6 +38,11 @@ function isDashboardFresh(a){
  var ms=Date.now()-Date.parse(a.checkedAt||'');
  return isFinite(ms)&&ms>=0&&ms<=20*60*1000;
 }
+function isAutoevalFresh(a){
+ if(!a||a.check!=='CONSULTA_ESTRUCTURA'||a.code==='MEDICION_VENCIDA')return false;
+ var ms=Date.now()-Date.parse(a.checkedAt||'');
+ return isFinite(ms)&&ms>=0&&ms<=20*60*1000;
+}
 function health(a){return a.status==='ok'?'correcta':a.status==='warning'?'con advertencia':a.status==='error'?'con error':'sin comprobar';}
 function reason(code){
  var known={
@@ -56,8 +61,17 @@ function noMeasure(){
   ' No sería correcto afirmar que las aplicaciones están funcionando o fallando.';
 }
 function answerApp(def){
- if(def.key!=='dashboard'&&!isFresh())return noMeasure();
+ if(def.key!=='dashboard'&&def.key!=='autoevaluacion'&&!isFresh())return noMeasure();
  var a=oneApp(def.key);
+ if(def.key==='autoevaluacion'){
+   if(!isAutoevalFresh(a))
+     return 'Autoevaluación ECO V2.0 no tiene una medición estructural reciente. Esto no implica que esté desconectada ni que se hayan perdido respuestas. La revisión automática se programa cada 15 minutos.';
+   if(a.status==='unverified')
+     return 'La comprobación estructural de Autoevaluación no fue concluyente. Código técnico: '+String(a.code||'SIN_CODIGO').slice(0,40)+'. No confirma falla del cuestionario.';
+   var out='Autoevaluación ECO V2.0: comprobación de estructura y catálogo '+health(a)+'. Última revisión: '+datetime(a.checkedAt)+'.';
+   if(a.latencyMs!=null)out+=' Lectura: '+(Number(a.latencyMs)/1000).toFixed(1)+' segundos.';
+   return out+' Esta prueba no verifica inicio de sesión, captura ni guardado de respuestas.';
+ }
  if(def.key!=='dashboard')
    return def.name+' todavía no tiene una prueba funcional conectada al Monitor ECO. '+
      'Por eso no puedo confirmar si funciona o si tiene alguna falla. '+
@@ -87,7 +101,8 @@ function overview(){
  var r='Revisión del '+datetime(snapshot.lastCheck)+'.\n'+
  'Fuentes de Sheets: '+Number(c.ok||0)+' correctas, '+Number(c.warning||0)+' con advertencia y '+Number(c.error||0)+' con error, de '+Number(c.total||0)+' revisadas.\n'+
  'Dashboard Ejecutivo ECO: '+dashboard+'.\n'+
- 'Las otras cinco aplicaciones aún no tienen prueba funcional.';
+ 'Autoevaluación ECO V2.0: '+(isAutoevalFresh(oneApp('autoevaluacion'))?health(oneApp('autoevaluacion'))+' (solo estructura y catálogo)':'sin medición estructural reciente')+'.\n'+
+ 'Otras cuatro aplicaciones aún no tienen prueba funcional.';
  var alerts=allSources().filter(function(x){return x.status==='error'||x.status==='warning';});
  if(alerts.length)r+='\nFuentes con alertas: '+alerts.map(function(x){return x.name+' ('+health(x)+')';}).join('; ')+'.';
  return r;
@@ -160,8 +175,8 @@ function reply(question){
  }
  if(includesAny(q,['resumen','estado general','como esta','como va','que muestra','funcionando','todo bien','estado de las apps']))return overview();
  if(includesAny(q,['conectadas','sin conectar','no conectadas']))
-   return 'El Monitor aún no realiza pruebas funcionales de Autoevaluación ECO, Evaluación 360 ECO, Centro de Administración ECO, Mi Persona ECO ni Familia ECO. El Dashboard tiene una comprobación separada de consulta ejecutiva cuya vigencia hay que verificar.';
- return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar fuentes de Sheets, comprobación de consulta del Dashboard, estados registrados, tiempos e historial. No puedo atribuir causas sin registros.';
+   return 'El Monitor tiene pruebas técnicas independientes del Dashboard (consulta ejecutiva) y Autoevaluación (estructura y catálogo). No prueban el funcionamiento integral de esas apps. Evaluación 360, Centro de Administración, Mi Persona y Familia siguen sin prueba funcional conectada.';
+ return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar fuentes de Sheets, consulta del Dashboard, estructura de Autoevaluación, estados registrados, tiempos e historial. No puedo atribuir causas sin registros.';
 }
 function add(text,kind){
  var msg=document.createElement('div');
