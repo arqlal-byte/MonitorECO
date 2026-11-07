@@ -301,7 +301,7 @@ function welcomeState(){
 }
 function updateWelcome(){
  var state=welcomeState();
- if(welcome&&welcome.textContent!==state.message)welcome.textContent=state.message;
+ if(welcome&&welcome.textContent!=='Bienvenido a mi lugar de trabajo')welcome.textContent='Bienvenido a mi lugar de trabajo';
  if(hero)hero.setAttribute('data-status',state.level);
  return state;
 }
