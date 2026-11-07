@@ -7,7 +7,9 @@
 var box=document.getElementById('eco-chat-panel'),open=document.getElementById('eco-chat-open'),
     close=document.getElementById('eco-chat-close'),form=document.getElementById('eco-chat-form'),
     input=document.getElementById('eco-chat-input'),messages=document.getElementById('eco-chat-messages'),
-    stamp=document.getElementById('eco-chat-stamp');
+    stamp=document.getElementById('eco-chat-stamp'),
+    welcome=document.getElementById('eco-assistant-welcome'),
+    hero=document.getElementById('assistant-hero');
 if(!box||!open||!close||!form||!input||!messages)return;
 var snapshot=window.ECO_MONITOR_PUBLIC_SNAPSHOT||null;
 var focusBefore=null;
@@ -265,6 +267,44 @@ function reply(question){
    return 'El Monitor comprueba Dashboard (consulta ejecutiva), Autoevaluación y Evaluación 360 (estructura), Servicio de Datos (Bridge), Centro: '+individualStatus('administracion')+' y Mi Persona: '+individualStatus('persona')+'. Familia: '+familiaStatus()+'. No se prueban logins reales ni guardados.';
  return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar las fuentes de Sheets, Dashboard, Autoevaluación, Evaluación 360, Servicio de Datos compartido, sus dependencias y el historial. No puedo atribuir causas sin registros.';
 }
+/** Bienvenida basada exclusivamente en mediciones técnicas recientes, no en supuesta IA autónoma. */
+function welcomeState(){
+ if(!snapshot)return {level:'pending',
+   message:'Estoy atento, cumpliendo mi trabajo. Estoy consultando las mediciones. ¿En qué puedo ayudarte?'};
+ if(!isFresh())return {level:'pending',
+   message:'Estoy atento, cumpliendo mi trabajo. No cuento todavía con mediciones vigentes. ¿En qué puedo ayudarte?'};
+ var c=snapshot.counts||{};
+ var checks=[
+   {key:'dashboard',valid:isDashboardFresh},
+   {key:'autoevaluacion',valid:isAutoevalFresh},
+   {key:'evaluacion360',valid:isEvaluacion360Fresh},
+   {key:'administracion',valid:individualFresh},
+   {key:'persona',valid:individualFresh},
+   {key:'familia',valid:familiaFresh}
+ ];
+ var measured=checks.map(function(check){
+   var a=oneApp(check.key);
+   return check.valid(a)?a:null;
+ });
+ var service=servicioDatos(),serviceIsFresh=servicioFresh(service);
+ var countErrors=Number(c.error||0),countWarnings=Number(c.warning||0);
+ if(countErrors>0||measured.some(function(a){return a&&a.status==='error';})||
+     (serviceIsFresh&&service.status==='error'))
+   return {level:'error',message:'Estoy atento, cumpliendo mi trabajo. Detecté una incidencia en las comprobaciones técnicas. ¿Quieres que la revisemos?'};
+ if(countWarnings>0||measured.some(function(a){return a&&a.status==='warning';})||
+     (serviceIsFresh&&service.status==='warning'))
+   return {level:'warning',message:'Estoy atento, cumpliendo mi trabajo. Hay una advertencia que conviene revisar. ¿En qué puedo ayudarte?'};
+ if(Number(c.total)>0&&measured.length===6&&measured.every(function(a){return a&&a.status==='ok';})&&
+     serviceIsFresh&&service.status==='ok'&&countErrors===0&&countWarnings===0)
+   return {level:'ok',message:'Estoy atento, cumpliendo mi trabajo. Por ahora parece que todo está bien. ¿En qué puedo ayudarte?'};
+ return {level:'pending',message:'Estoy atento, cumpliendo mi trabajo. Algunas comprobaciones están pendientes o sin datos recientes. ¿En qué puedo ayudarte?'};
+}
+function updateWelcome(){
+ var state=welcomeState();
+ if(welcome&&welcome.textContent!==state.message)welcome.textContent=state.message;
+ if(hero)hero.setAttribute('data-status',state.level);
+ return state;
+}
 function add(text,kind){
  var msg=document.createElement('div');
  msg.className='eco-chat-message eco-chat-'+kind;
@@ -283,7 +323,10 @@ function openPanel(){
  focusBefore=document.activeElement;
  box.hidden=false;
  document.body.classList.add('eco-chat-visible');
- if(!messages.children.length)add('Puedo explicar los estados que ya aparecen en Monitor ECO. Si una aplicación todavía no tiene prueba conectada, te lo indicaré expresamente.','answer');
+ if(!messages.children.length){
+   add(updateWelcome().message,'answer');
+   add('Puedo explicar las mediciones técnicas del tablero, pero no comprobar funciones que el Monitor aún no supervisa.','answer');
+ }
  input.focus();
 }
 function closePanel(){
@@ -301,6 +344,7 @@ document.querySelectorAll('[data-eco-chat-ask]').forEach(function(b){
 });
 window.ecoMonitorReceiveSnapshot=function(data){
  snapshot=data&&typeof data==='object'?data:null;
+ updateWelcome();
  if(stamp)stamp.textContent=isFresh()?'Datos del '+datetime(snapshot.lastCheck):
    'Sin medición vigente';
  var bot=document.querySelector('.eco-bot-stage');
@@ -309,4 +353,5 @@ window.ecoMonitorReceiveSnapshot=function(data){
  if(caption)caption.textContent=isFresh()?'DATOS VIGENTES':'EN ESPERA';
 };
 if(snapshot)window.ecoMonitorReceiveSnapshot(snapshot);
+else updateWelcome();
 })();
