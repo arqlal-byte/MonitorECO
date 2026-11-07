@@ -384,13 +384,13 @@ function renderServicioDatos(data){
    if(!node)return;
    var dot=node.querySelector('.dot'),status=node.querySelector('.node-status');
    var time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
-   if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
+   if(dot){dot.classList.remove('warn','error');dot.style.background=app?tint:'#7f9caf';dot.style.boxShadow='none';}
    if(status&&status.lastChild)status.lastChild.textContent=app?
-     (app.status==='ok'?' Servicio de Datos: correcto':' Servicio con incidencia'):
-     ' Servicio sin comprobación vigente';
-   if(time)time.textContent='Aplicación sin prueba funcional';
-   if(tag)tag.textContent=app?(app.status==='ok'?'SERVICIO OK':'SERVICIO ALERTA'):'SIN PRUEBA';
-   node.style.borderColor='#256181';
+     (app.status==='ok'?' Conexión al Servicio de Datos comprobada':' Servicio de Datos con incidencia'):
+     ' Servicio de Datos sin medición reciente';
+   if(time)time.textContent='Funciones propias pendientes de verificar';
+   if(tag)tag.textContent=app?(app.status==='ok'?'SERVICIO OK':'SERVICIO ALERTA'):'SIN MEDICIÓN';
+   node.style.borderColor=app&&app.status==='ok'?'#267f78':'#256181';
  });
  var footer=document.querySelector('.footer strong');
  if(footer)footer.textContent+=' · SERVICIO COMPARTIDO: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN PRUEBA VIGENTE');
@@ -532,6 +532,16 @@ function renderHistory(history,counts){
 }
 function openDrawer(title,body,state){
  $('drawer-title').textContent=title;$('drawer-desc').textContent=body;$('drawer-state').textContent=state;
+ var note=$('drawer-measure-note'),source=$('drawer-sources');
+ var stateText=String(state||'');
+ var noMeasure=/SIN MEDICI[ÓO]N|SIN PRUEBA FUNCIONAL|COMPROBACI[ÓO]N PENDIENTE|DATOS DESACTUALIZADOS/i.test(stateText);
+ if(note){
+   note.hidden=!noMeasure;
+   if(noMeasure)note.textContent='Sin una medición vigente de esta comprobación no se puede confirmar su funcionamiento ni una desconexión.';
+ }
+ if(source)source.textContent=stateText.indexOf('SERVICIO DE DATOS')===0?
+   'Fuente: Servicio de Datos ECO · comprobación estructural firmada.':
+   'Fuente: Mediciones técnicas publicadas por Monitor ECO.';
  $('drawer').hidden=false;$('close-drawer').focus();
 }
 function showSources(ev){
@@ -588,7 +598,10 @@ document.querySelectorAll('.appnode').forEach(function(node){
        app==='evaluacion360'?
        evaluacion360Reason(diagnostic)+'\nLa consulta no lee ni modifica evaluaciones individuales.':
        esConsumidor?
-       'Esta aplicación utiliza Servicio de Datos ECO como dependencia compartida.\n'+servicioReason(shared)+
+       (sharedOk&&sharedOk.status==='ok'?
+         'Conexión al Servicio de Datos ECO comprobada.\nFunciones propias pendientes de verificar.\n':
+         'Esta aplicación utiliza Servicio de Datos ECO como dependencia compartida.\n')+
+       servicioReason(shared)+
        (shared&&shared.checkedAt&&isFinite(Date.parse(shared.checkedAt))?
          '\nÚltima comprobación del servicio: '+new Date(shared.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}):'')+
        (sharedOk&&sharedOk.latencyMs!=null?'\nTiempo de revisión: '+(asNum(sharedOk.latencyMs)/1000).toFixed(1)+' s.':'')+
@@ -602,7 +615,10 @@ document.querySelectorAll('.appnode').forEach(function(node){
        app==='autoevaluacion'||app==='evaluacion360'?
        (diagnostic&&((app==='autoevaluacion'?autoevalFresh:evaluacion360Fresh)(diagnostic))?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
        (app==='administracion'||app==='persona')?
-       (verifiedServicio(latest)?'SERVICIO COMPARTIDO REVISADO · APP SIN PRUEBA':'APP SIN PRUEBA FUNCIONAL'):
+       (sharedOk?
+         (sharedOk.status==='ok'?'SERVICIO DE DATOS COMPROBADO · FUNCIONES SIN VERIFICAR':
+          'SERVICIO DE DATOS CON INCIDENCIA · FUNCIONES SIN VERIFICAR'):
+         'SERVICIO DE DATOS SIN MEDICIÓN · FUNCIONES SIN VERIFICAR'):
        'SIN PRUEBA FUNCIONAL');
    }
  },true);
