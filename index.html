@@ -272,7 +272,7 @@ body.eco-chat-visible{overflow:hidden}
 <footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
 </div>
 <div class="demo-watermark">LECTURA PENDIENTE</div>
-<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p><strong>Fuentes:</strong> Según la medición más reciente disponible.</p><p class="tagline">Sin medición reciente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
+<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p id="drawer-sources"><strong>Fuente:</strong> Mediciones técnicas publicadas por Monitor ECO.</p><p class="tagline" id="drawer-measure-note" hidden>Sin una medición vigente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
 <script src="./config.js?v=20261106-conexion1"></script>
 <script>
 (function(){
@@ -354,7 +354,7 @@ if(!window.ECO_MONITOR_ENDPOINT)states();
     <p class="eco-chat-note">Interpretación contextual basada en mediciones publicadas. No es IA generativa; no modifica sistemas, no accede a datos personales ni conoce causas no verificadas.</p>
   </section>
 </div>
-<script src="./monitor-live.js?v=20261107-servicio1"></script>
+<script src="./monitor-live.js?v=20261107-ajuste-visual1"></script>
 <script src="./eco-analista.js?v=20261107-servicio1"></script>
 
 </body>
