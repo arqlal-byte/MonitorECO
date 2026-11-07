@@ -121,7 +121,7 @@ function anomaly(){
  var fail=isDashboardFresh(a)&&a.status!=='ok';
  if(!alerts.length&&!fail)return 'En las comprobaciones disponibles no se detectan alertas en Sheets'+
  (isDashboardFresh(a)?' ni en la consulta ejecutiva del Dashboard':'')+
- '. Esto no garantiza el funcionamiento integral del ecosistema: cinco aplicaciones siguen sin prueba funcional.';
+ '. Esto no garantiza el funcionamiento integral del ecosistema: cuatro aplicaciones siguen sin prueba funcional y Autoevaluación solo tiene prueba de estructura.';
  var out=[];
  if(fail)out.push('Dashboard Ejecutivo ECO: '+(a.status==='unverified'?'sin prueba autorizada':health(a))+'. '+reason(a.code));
  alerts.forEach(function(x){out.push(x.name+': '+health(x)+'. '+advise(x));});
