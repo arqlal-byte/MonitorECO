@@ -43,6 +43,11 @@ function isAutoevalFresh(a){
  var ms=Date.now()-Date.parse(a.checkedAt||'');
  return isFinite(ms)&&ms>=0&&ms<=20*60*1000;
 }
+function isEvaluacion360Fresh(a){
+ if(!a||a.check!=='CONSULTA_ESTRUCTURA'||a.code==='MEDICION_VENCIDA')return false;
+ var age=Date.now()-Date.parse(a.checkedAt||'');
+ return isFinite(age)&&age>=0&&age<=20*60*1000;
+}
 function health(a){return a.status==='ok'?'correcta':a.status==='warning'?'con advertencia':a.status==='error'?'con error':'sin comprobar';}
 function reason(code){
  var known={
@@ -61,7 +66,7 @@ function noMeasure(){
   ' No sería correcto afirmar que las aplicaciones están funcionando o fallando.';
 }
 function answerApp(def){
- if(def.key!=='dashboard'&&def.key!=='autoevaluacion'&&!isFresh())return noMeasure();
+ if(def.key!=='dashboard'&&def.key!=='autoevaluacion'&&def.key!=='evaluacion360'&&!isFresh())return noMeasure();
  var a=oneApp(def.key);
  if(def.key==='autoevaluacion'){
    if(!isAutoevalFresh(a))
@@ -71,6 +76,15 @@ function answerApp(def){
    var out='Autoevaluación ECO V2.0: comprobación de estructura y catálogo '+health(a)+'. Última revisión: '+datetime(a.checkedAt)+'.';
    if(a.latencyMs!=null)out+=' Lectura: '+(Number(a.latencyMs)/1000).toFixed(1)+' segundos.';
    return out+' Esta prueba no verifica inicio de sesión, captura ni guardado de respuestas.';
+ }
+ if(def.key==='evaluacion360'){
+   if(!isEvaluacion360Fresh(a))
+     return 'Evaluación 360 no tiene una comprobación estructural reciente. No significa desconexión ni pérdida de evaluaciones. Revisión automática prevista cada 15 minutos.';
+   if(a.status==='unverified')
+     return 'La comprobación estructural de Evaluación 360 no fue concluyente. Código: '+String(a.code||'SIN_CODIGO').slice(0,40)+'. No demuestra una falla del cuestionario.';
+   var msg='Evaluación 360 ECO: estructura, encabezados y 60 preguntas del ciclo activo '+health(a)+'. Última revisión: '+datetime(a.checkedAt)+'.';
+   if(a.latencyMs!=null&&Number.isFinite(Number(a.latencyMs)))msg+=' Tiempo: '+(Number(a.latencyMs)/1000).toFixed(1)+' segundos.';
+   return msg+' La revisión no comprueba acceso de evaluadores, guardado de respuestas ni cálculos nocturnos.';
  }
  if(def.key!=='dashboard')
    return def.name+' todavía no tiene una prueba funcional conectada al Monitor ECO. '+
@@ -102,7 +116,8 @@ function overview(){
  'Fuentes de Sheets: '+Number(c.ok||0)+' correctas, '+Number(c.warning||0)+' con advertencia y '+Number(c.error||0)+' con error, de '+Number(c.total||0)+' revisadas.\n'+
  'Dashboard Ejecutivo ECO: '+dashboard+'.\n'+
  'Autoevaluación ECO V2.0: '+(isAutoevalFresh(oneApp('autoevaluacion'))?health(oneApp('autoevaluacion'))+' (solo estructura y catálogo)':'sin medición estructural reciente')+'.\n'+
- 'Otras cuatro aplicaciones aún no tienen prueba funcional.';
+ 'Evaluación 360 ECO: '+(isEvaluacion360Fresh(oneApp('evaluacion360'))?health(oneApp('evaluacion360'))+' (solo estructura y preguntas)':'sin medición estructural reciente')+'.\n'+
+ 'Otras tres aplicaciones siguen sin prueba funcional conectada.';
  var alerts=allSources().filter(function(x){return x.status==='error'||x.status==='warning';});
  if(alerts.length)r+='\nFuentes con alertas: '+alerts.map(function(x){return x.name+' ('+health(x)+')';}).join('; ')+'.';
  return r;
@@ -117,16 +132,18 @@ function advise(s){
 function anomaly(){
  if(!isFresh())return noMeasure();
  var alerts=allSources().filter(function(x){return x.status==='warning'||x.status==='error';});
- var a=oneApp('dashboard');
- var fail=isDashboardFresh(a)&&a.status!=='ok';
- if(!alerts.length&&!fail)return 'En las comprobaciones disponibles no se detectan alertas en Sheets'+
- (isDashboardFresh(a)?' ni en la consulta ejecutiva del Dashboard':'')+
- '. Esto no garantiza el funcionamiento integral del ecosistema: cuatro aplicaciones siguen sin prueba funcional y Autoevaluación solo tiene prueba de estructura.';
+ var dash=oneApp('dashboard'),auto=oneApp('autoevaluacion'),eval360=oneApp('evaluacion360');
  var out=[];
- if(fail)out.push('Dashboard Ejecutivo ECO: '+(a.status==='unverified'?'sin prueba autorizada':health(a))+'. '+reason(a.code));
+ if(isDashboardFresh(dash)&&dash.status!=='ok')
+   out.push('Dashboard: '+health(dash)+'. '+reason(dash.code));
+ if(isAutoevalFresh(auto)&&auto.status!=='ok')
+   out.push('Autoevaluación: revisión estructural '+health(auto)+'. Código: '+String(auto.code||'SIN_CODIGO').slice(0,40)+'.');
+ if(isEvaluacion360Fresh(eval360)&&eval360.status!=='ok')
+   out.push('Evaluación 360: revisión estructural '+health(eval360)+'. Código: '+String(eval360.code||'SIN_CODIGO').slice(0,40)+'.');
  alerts.forEach(function(x){out.push(x.name+': '+health(x)+'. '+advise(x));});
+ if(!out.length)return 'No se detectan alertas entre las comprobaciones disponibles. Dashboard: solo consulta ejecutiva; Autoevaluación y Evaluación 360: solo estructura. Tres aplicaciones siguen sin prueba conectada. No se demuestra funcionamiento integral.';
  return 'Anomalías que el Monitor sí registra:\n'+out.join('\n')+
-  '\nSon comprobaciones técnicas, no una explicación confirmada de la causa raíz.';
+   '\nSon comprobaciones técnicas, no la causa raíz.';
 }
 function explainSources(){
  if(!isFresh())return noMeasure();
@@ -175,8 +192,8 @@ function reply(question){
  }
  if(includesAny(q,['resumen','estado general','como esta','como va','que muestra','funcionando','todo bien','estado de las apps']))return overview();
  if(includesAny(q,['conectadas','sin conectar','no conectadas']))
-   return 'El Monitor tiene pruebas técnicas independientes del Dashboard (consulta ejecutiva) y Autoevaluación (estructura y catálogo). No prueban el funcionamiento integral de esas apps. Evaluación 360, Centro de Administración, Mi Persona y Familia siguen sin prueba funcional conectada.';
- return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar fuentes de Sheets, consulta del Dashboard, estructura de Autoevaluación, estados registrados, tiempos e historial. No puedo atribuir causas sin registros.';
+   return 'El Monitor tiene comprobaciones del Dashboard (consulta ejecutiva), Autoevaluación (estructura y catálogo) y Evaluación 360 (estructura y 60 preguntas). No prueban guardados ni funcionamiento integral. Centro de Administración, Mi Persona y Familia siguen sin prueba funcional conectada.';
+ return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar fuentes de Sheets, consulta del Dashboard, estructura de Autoevaluación y Evaluación 360, estados registrados, tiempos e historial. No puedo atribuir causas sin registros.';
 }
 function add(text,kind){
  var msg=document.createElement('div');
