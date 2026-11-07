@@ -4,7 +4,8 @@
  * Solo activa la conversación generativa cuando Apps Script confirma
  * que está disponible. No agrega límites de consultas.
  * Mantiene la clave API exclusivamente en Google Apps Script.
- * Recuerda el nombre aportado durante esta conversación (no lo almacena).
+ * Solicita el nombre en cada conversación; el respaldo optativo de recuerdos
+ * se conserva en Sheets (Apps Script) y un identificador local del navegador.
  */
 (function(){
   'use strict';
@@ -21,6 +22,8 @@
   var busy=false;
   var history=[];
   var visitorName='';
+  var visitorKey='';
+  var greeting='¡Hola! Soy JARVIS, colaboro con el equipo de Capital Humano. 😄 Qué gusto saludarte, ¿con quién tengo el gusto?';
   var counter=0;
   var base=endpoint.split('?')[0];
 
@@ -78,24 +81,37 @@
     });
     return JSON.stringify(compact);
   }
+  function localKeyForName(name){
+    // Token aleatorio por perfil y navegador: no es una prueba de identidad.
+    try{
+      var label=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,70);
+      if(!label || !window.crypto || !window.crypto.getRandomValues || !window.localStorage)return '';
+      var storageKey='jarvis.eco.memoria.v1.'+label;
+      var old=localStorage.getItem(storageKey);
+      if(/^jv_[a-f0-9]{36}$/.test(old||''))return old;
+      var bytes=new Uint8Array(18);window.crypto.getRandomValues(bytes);
+      var hex=Array.prototype.map.call(bytes,function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+      var id='jv_'+hex;localStorage.setItem(storageKey,id);return id;
+    }catch(ignored){return '';}
+  }
   function rememberVisitorName(question){
     if(visitorName)return;
-    var m=String(question||'').match(/(?:^|\s)(?:me llamo|mi nombre es)\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,2})/i);
-    if(m){visitorName=m[1].trim().slice(0,60);return;}
-    // Cuando la respuesta anterior pidió el nombre, aceptar un nombre breve.
-    var last=history.length?history[history.length-1]:null;
-    if(last && last.role==='assistant' && /(?:c[oó]mo te llamas|cu[aá]l es tu nombre)/i.test(last.content)){
-      var q=String(question||'').trim();
-      if(/^[A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2}$/.test(q) && !/^(?:hola|gracias|no|si|sí|bien|perfecto)$/i.test(q)){
-        visitorName=q.slice(0,60);
+    var q=String(question||'').trim();
+    var match=q.match(/^(?:(?:hola[,.!]?\s*)?(?:soy|me llamo|mi nombre es)\s+)([A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+){0,2})(?=$|[.,!?]|\s+(?:y|pero|trabajo|del|de|en|mucho|gracias)\b)/i);
+    if(match&& !/^(?:de|del|en|la|el|los|las|un|una|ventas|mantenimiento)$/i.test(match[1]))visitorName=match[1].trim().slice(0,60);
+    if(!visitorName){
+      var last=history.length?history[history.length-1]:null;
+      if(last && last.role==='assistant' && /(?:c[oó]mo te llamas|cu[aá]l es tu nombre|con qui[eé]n tengo el gusto)/i.test(last.content)){
+        if(/^[A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+){0,2}$/.test(q)&&!/^(?:hola|gracias|no|si|sí|bien|perfecto|ok)$/i.test(q))visitorName=q.slice(0,60);
       }
     }
+    if(visitorName)visitorKey=localKeyForName(visitorName);
   }
   function setBusy(value){
     busy=value;
     input.readOnly=!!value;
     input.setAttribute('aria-busy',value?'true':'false');
-    if(status)status.textContent=value?'JARVIS está consultando OpenAI…':'JARVIS conectado a OpenAI';
+    if(status)status.textContent=value?'JARVIS está preparando su respuesta…':'JARVIS ECO · Capital Humano';
   }
   function onSubmit(event){
     if(!enabled)return; // Conserva intacto el asistente anterior hasta el despliegue real.
@@ -107,16 +123,16 @@
     rememberVisitorName(q);
     input.value='';
     append(q,'question');
-    var pendingAnswer=append('Consultando OpenAI…','answer');
+    var pendingAnswer=append('Déjame revisarlo…','answer');
     var previous=historyParam();
     setBusy(true);
-    ask({question:q,history:previous,visitorName:visitorName},90000).then(function(res){
+    ask({question:q,history:previous,visitorName:visitorName,visitorKey:visitorKey},90000).then(function(res){
       var reply=res&&res.ok&&typeof res.text==='string'&&res.text.trim()
         ?res.text.trim():String(res&&res.error||'No fue posible obtener una respuesta de OpenAI.');
       pendingAnswer.textContent=reply;
       if(res&&res.ok){
         history.push({role:'user',content:q},{role:'assistant',content:reply});
-        // Se conserva la conversación en memoria de esta pestaña, sin guardar datos en Sheets.
+        // El historial de mensajes sigue sólo en esta pestaña. Sheets guarda únicamente recuerdos consentidos.
         if(history.length>14)history=history.slice(-14);
       }
     }).catch(function(){
@@ -131,7 +147,10 @@
   ask({mode:'ping'},14000).then(function(pong){
     if(!pong||pong.service!=='jarvis-eco-ai-v1'||pong.ready!==true)return;
     enabled=true;
-    if(status)status.textContent='JARVIS conectado a OpenAI';
+    if(status)status.textContent='JARVIS ECO · Capital Humano';
+    // Bienvenida nueva cada vez que se carga el chat; no presupone nombre ni identidad.
+    append(greeting,'answer');
+    history.push({role:'assistant',content:greeting});
     // Captura antes del listener anterior, conservando el resto de sus funciones.
     form.addEventListener('submit',onSubmit,true);
   }).catch(function(){
