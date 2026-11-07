@@ -329,6 +329,78 @@ function renderEvaluacion360(data,stale){
    'comprobación estructural con incidencia técnica, pendiente de revisar.');
 }
 
+
+/* Servicio de Datos compartido: comprobación independiente.
+   La validez del puente, de las funciones y de las nueve fuentes NO equivale
+   a una prueba de inicio de sesión, escritura o uso de Centro y Mi Persona. */
+function servicioDiagnostic(data){
+ if(!data||!Array.isArray(data.services))return null;
+ return data.services.find(function(a){return a&&a.key==='servicioDatos'&&a.check==='CONSULTA_ESTRUCTURA';})||null;
+}
+function servicioFresh(a){
+ if(!a||!a.checkedAt||a.code==='MEDICION_VENCIDA')return false;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000;
+}
+function verifiedServicio(data){
+ var a=servicioDiagnostic(data);
+ return a&&servicioFresh(a)&&['ok','warning','error'].indexOf(a.status)>=0?a:null;
+}
+function servicioReason(a){
+ if(!a)return 'Todavía no se ha publicado una medición del Servicio de Datos en Monitor ECO. No significa que el servicio esté desconectado.';
+ if(!servicioFresh(a))return 'La medición del Servicio de Datos ya no está vigente. Esto no demuestra que Centro o Mi Persona estén desconectadas.';
+ var reasons={
+  CONSULTA_ESTRUCTURA_EXITOSA:'Se comprobaron el puente de comunicación, las funciones esenciales y la estructura de nueve fuentes oficiales.',
+  CONSULTA_FALLIDA:'La revisión estructural del servicio reportó una incidencia; consultar los registros de Servicio de Datos ECO.',
+  SIN_CONFIGURACION:'Falta configurar la clave privada en Monitor ECO.',
+  NO_AUTORIZADO:'La firma privada no fue aceptada. Revisar la configuración de ambos proyectos sin compartir la clave.',
+  SIN_RESPUESTA_VALIDA:'No hubo una respuesta verificable desde el despliegue del Servicio de Datos.',
+  SOLICITUD_INVALIDA:'La solicitud de revisión no fue aceptada por el servicio.'
+ };
+ return reasons[String(a.code||'')]||'La comprobación no fue concluyente. Código: '+
+   String(a.code||'SIN_CODIGO').replace(/[^A-Z0-9_]/g,'').slice(0,40)+'.';
+}
+function renderServicioDatos(data){
+ var diagnostic=servicioDiagnostic(data),app=verifiedServicio(data);
+ var condition=app?(app.status==='ok'?'Estructura comprobada':app.status==='warning'?'Estructura con advertencia':'Incidencia de estructura'):
+   diagnostic&&servicioFresh(diagnostic)?'Comprobación pendiente':'Sin medición reciente';
+ var tint=app?(app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a'):'#7f9caf';
+ var stamp=diagnostic&&diagnostic.checkedAt&&isFinite(Date.parse(diagnostic.checkedAt))?
+   new Date(diagnostic.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Sin fecha verificable';
+ var process=document.querySelector('.process-list');
+ if(process){
+   process.innerHTML='<div class="process" style="align-items:flex-start;gap:9px;">'+
+     '<i style="color:'+tint+';font-style:normal">'+(app&&app.status==='ok'?'✓':app&&app.status==='error'?'!':'?')+'</i>'+
+     '<span style="min-width:0;flex:1"><strong>Servicio de Datos ECO</strong>'+
+     '<small style="display:block;color:#bcdaf1;font-size:11px;line-height:1.5">'+esc(condition)+
+     ' · Bridge y 9 hojas · '+esc(stamp)+'</small></span></div>'+
+     '<div style="font-size:11px;line-height:1.6;color:#b8d2e8;padding-top:7px">'+
+     'Dependencias: Centro de Administración y Mi Persona ECO. '+ 
+     'El estado del servicio no prueba sus sesiones, operaciones de RH, evidencias ni guardados. '+
+     'No se supervisan todavía los disparadores ni procesos nocturnos de otras aplicaciones.</div>';
+ }
+ [3,4].forEach(function(i){
+   var node=document.querySelector('.appnode[data-app="'+i+'"]');
+   if(!node)return;
+   var dot=node.querySelector('.dot'),status=node.querySelector('.node-status');
+   var time=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
+   if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
+   if(status&&status.lastChild)status.lastChild.textContent=app?
+     (app.status==='ok'?' Servicio de Datos: correcto':' Servicio con incidencia'):
+     ' Servicio sin comprobación vigente';
+   if(time)time.textContent='Aplicación sin prueba funcional';
+   if(tag)tag.textContent=app?(app.status==='ok'?'SERVICIO OK':'SERVICIO ALERTA'):'SIN PRUEBA';
+   node.style.borderColor='#256181';
+ });
+ var footer=document.querySelector('.footer strong');
+ if(footer)footer.textContent+=' · SERVICIO COMPARTIDO: '+(app?(app.status==='ok'?'ESTRUCTURA CORRECTA':'CON INCIDENCIA'):'SIN PRUEBA VIGENTE');
+ var activity=document.querySelector('.activity');
+ if(activity&&app)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+tint+';box-shadow:none"></span><span>Servicio de Datos: '+esc(condition)+
+  ' · '+esc(stamp)+' · 2 aplicaciones dependientes (sin prueba funcional)</span></div>';
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent+=' · Servicio de Datos: '+condition.toLowerCase()+'; Centro y Mi Persona sin prueba funcional.';
+}
+
 function apply(data){
  if(!data||data.schema!==1||!Array.isArray(data.sources)||!data.counts){neutral('Respuesta del monitor inválida');return;}
  if(!data.connected||!data.lastCheck){latest=null;neutral('Servicio accesible, pero todavía sin una medición registrada');return;}
@@ -431,6 +503,7 @@ function apply(data){
  renderDashboard(data,stale);
  renderAutoevaluacion(data,stale);
  renderEvaluacion360(data,stale);
+ renderServicioDatos(data);
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
@@ -505,18 +578,31 @@ document.querySelectorAll('.appnode').forEach(function(node){
      var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):
        app==='autoevaluacion'?autoevalDiagnostic(latest):
        app==='evaluacion360'?evaluacion360Diagnostic(latest):null;
+     var esConsumidor=app==='administracion'||app==='persona';
+     var shared=esConsumidor?servicioDiagnostic(latest):null;
+     var sharedOk=esConsumidor?verifiedServicio(latest):null;
      var explanation=app==='dashboard'?
        dashboardReason(diagnostic)+'\nLos estados de Sheets no prueban por sí solos que el Dashboard funcione.':
        app==='autoevaluacion'?
        autoevalReason(diagnostic)+'\nEsta prueba no verifica ni modifica las respuestas de los líderes.':
        app==='evaluacion360'?
        evaluacion360Reason(diagnostic)+'\nLa consulta no lee ni modifica evaluaciones individuales.':
-       'Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.';
+       esConsumidor?
+       'Esta aplicación utiliza Servicio de Datos ECO como dependencia compartida.\n'+servicioReason(shared)+
+       (shared&&shared.checkedAt&&isFinite(Date.parse(shared.checkedAt))?
+         '\nÚltima comprobación del servicio: '+new Date(shared.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}):'')+
+       (sharedOk&&sharedOk.latencyMs!=null?'\nTiempo de revisión: '+(asNum(sharedOk.latencyMs)/1000).toFixed(1)+' s.':'')+
+       '\nAlcance: se comprueban Bridge, funciones esenciales y nueve hojas; NO se comprueban sesiones, acceso real, operaciones de RH, evidencias ni guardados. No se considera la aplicación funcionalmente verificada.':
+       app==='familia'?
+       'Familia ECO utiliza su propio servicio de consulta. La estructura de su fuente compartida no demuestra que su portal independiente esté funcionando. Falta una prueba específica.':
+       'Todavía no hay una comprobación funcional vigente conectada para esta aplicación.';
      $('drawer-desc').style.whiteSpace='pre-line';
      openDrawer(data?data.name:'Aplicación ECO',explanation,
        app==='dashboard'?(diagnostic&&dashboardFresh(diagnostic)?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
        app==='autoevaluacion'||app==='evaluacion360'?
        (diagnostic&&((app==='autoevaluacion'?autoevalFresh:evaluacion360Fresh)(diagnostic))?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):
+       (app==='administracion'||app==='persona')?
+       (verifiedServicio(latest)?'SERVICIO COMPARTIDO REVISADO · APP SIN PRUEBA':'APP SIN PRUEBA FUNCIONAL'):
        'SIN PRUEBA FUNCIONAL');
    }
  },true);
