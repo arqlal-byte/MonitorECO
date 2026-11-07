@@ -355,6 +355,15 @@ function verifiedIndividual(data,key){
  var age=Date.now()-Date.parse(a.checkedAt);
  return isFinite(age)&&age>=0&&age<=20*60*1000?a:null;
 }
+/** Familia ECO: página HTTP más API pública, sin autenticar ni escribir. */
+function verifiedFamilia(data){
+ if(!data||!Array.isArray(data.apps))return null;
+ var a=data.apps.find(function(x){return x&&x.key==='familia';});
+ if(!a||a.check!=='CONSULTA_PUBLICA_FAMILIA'||a.code==='MEDICION_VENCIDA'||
+    !a.checkedAt||['ok','warning','error'].indexOf(a.status)<0)return null;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000?a:null;
+}
 function servicioReason(a){
  if(!a)return 'Todavía no se ha publicado una medición del Servicio de Datos en Monitor ECO. No significa que el servicio esté desconectado.';
  if(!servicioFresh(a))return 'La medición del Servicio de Datos ya no está vigente. Esto no demuestra que Centro o Mi Persona estén desconectadas.';
@@ -437,6 +446,63 @@ function renderServicioDatos(data){
  });
  var notice=document.querySelector('.notice');
  if(notice)notice.textContent+=' · Servicio de Datos: '+condition.toLowerCase()+'; las pruebas de Centro y Mi Persona son parciales (sin login ni guardados).';
+}
+
+/** El estado de Familia se mide independientemente del Servicio de Datos. */
+function renderFamilia(data){
+ var app=verifiedFamilia(data);
+ var node=document.querySelector('.appnode[data-app="5"]');
+ var tint=app?(app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a'):'#7f9caf';
+ var condition=app?(app.status==='ok'?'Página y actividades disponibles':
+   app.status==='warning'?'Consulta pública con advertencia':'Error en la consulta pública'):
+   'Sin medición independiente vigente';
+ var stamp=app&&app.checkedAt?new Date(app.checkedAt).toLocaleString('es-MX',{
+   timeZone:'America/Mexico_City',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'
+ }):'Sin prueba vigente';
+ if(node){
+   var dot=node.querySelector('.dot'),state=node.querySelector('.node-status');
+   var when=node.querySelector('.node-time'),tag=node.querySelector('.node-tag');
+   if(dot){dot.classList.remove('warn','error');dot.style.background=tint;dot.style.boxShadow='none';}
+   if(state&&state.lastChild)state.lastChild.textContent=' '+condition;
+   if(when)when.textContent=app?(app.actividadesCount!=null?
+     'Actividades: '+asNum(app.actividadesCount)+' · '+stamp:'Última revisión: '+stamp):
+     'Página y API sin comprobar';
+   if(tag)tag.textContent=app?(app.status==='ok'?'PÁGINA + API OK':
+     app.status==='warning'?'ADVERTENCIA':'ERROR DE PRUEBA'):'SIN MEDICIÓN';
+   node.style.borderColor=app?tint:'#256181';
+ }
+ var process=document.querySelector('.process-list');
+ if(process)process.innerHTML+='<div class="process" style="align-items:flex-start;gap:9px;">'+
+   '<i style="color:'+tint+';font-style:normal">'+(app&&app.status==='ok'?'✓':app&&app.status==='error'?'!':'?')+'</i>'+
+   '<span style="min-width:0;flex:1"><strong>Familia ECO</strong>'+
+   '<small style="display:block;color:#bcdaf1;font-size:11px;line-height:1.5">'+
+   esc(condition)+' · '+esc(stamp)+'</small></span></div>';
+ var activity=document.querySelector('.activity');
+ if(activity&&app)activity.innerHTML+='<div class="activity-row"><span class="dot" style="background:'+tint+
+   ';box-shadow:none"></span><span>Familia ECO: '+esc(condition)+
+   ' · '+esc(stamp)+'</span></div>';
+ if(app){
+   var measured=[verifiedDashboard(data),verifiedAutoeval(data),verifiedEvaluacion360(data),
+     verifiedIndividual(data,'administracion'),verifiedIndividual(data,'persona'),app].filter(Boolean);
+   $('healthy').textContent=String(measured.filter(function(x){return x.status==='ok';}).length);
+   $('warnings').textContent=String(measured.filter(function(x){return x.status==='warning';}).length);
+   $('failures').textContent=String(measured.filter(function(x){return x.status==='error';}).length);
+   var labels=document.querySelectorAll('.metrics>.kpi');
+   if(labels.length>=5)[2,3,4].forEach(function(i){
+     var el=labels[i].querySelector('.hint');
+     if(el)el.textContent='Aplicaciones con comprobación técnica limitada';
+   });
+   var marker=document.querySelector('.demo-watermark');
+   if(marker)marker.textContent='SHEETS + '+measured.length+
+     ' PRUEBAS TÉCNICAS · '+(6-measured.length)+' APPS SIN MEDICIÓN PROPIA';
+   var mode=document.querySelector('.demo-pill');
+   if(mode)mode.textContent='● DATOS REALES · '+measured.length+' PRUEBAS TÉCNICAS';
+   var footer=document.querySelector('.footer strong');
+   if(footer)footer.textContent='MONITOREO: '+measured.length+' PRUEBAS TÉCNICAS VIGENTES · '+
+     (6-measured.length)+' APPS SIN PRUEBA PROPIA · FAMILIA: '+condition.toUpperCase();
+ }
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent+=' · Familia ECO: '+condition.toLowerCase()+'.';
 }
 
 function apply(data){
@@ -542,6 +608,7 @@ function apply(data){
  renderAutoevaluacion(data,stale);
  renderEvaluacion360(data,stale);
  renderServicioDatos(data);
+ renderFamilia(data);
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
@@ -604,9 +671,14 @@ document.querySelectorAll('.appnode').forEach(function(node){
    var checked=app==='dashboard'?verifiedDashboard(latest):
      app==='autoevaluacion'?verifiedAutoeval(latest):
      app==='evaluacion360'?verifiedEvaluacion360(latest):
-     (app==='administracion'||app==='persona')?verifiedIndividual(latest,app):null;
+     (app==='administracion'||app==='persona')?verifiedIndividual(latest,app):
+     app==='familia'?verifiedFamilia(latest):null;
    if(checked){
-     var detail=(app==='administracion'||app==='persona')?
+     var detail=app==='familia'?
+       (checked.status==='ok'?'Se comprobaron por separado la página pública y la API que publica sus actividades.':
+        checked.status==='warning'?'La página responde, pero las actividades presentan una advertencia.':
+        'La página o la API de actividades presentó un error de consulta.'):
+       (app==='administracion'||app==='persona')?
        (checked.status==='ok'?'Se comprobó lectura real del catálogo de actividades, mapeo de campos y rechazo de credenciales sin sesión.':
        checked.status==='warning'?'La prueba técnica parcial presentó advertencia.':
        'La prueba técnica parcial encontró una incidencia. Consultar registros del Servicio de Datos.'):
@@ -621,14 +693,23 @@ document.querySelectorAll('.appnode').forEach(function(node){
        checked.status==='warning'?'La estructura presenta una advertencia.':'La comprobación estructural reportó un error.');
      detail+='\nÚltima comprobación: '+new Date(checked.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'.';
      if(checked.latencyMs!=null)detail+='\nTiempo: '+(asNum(checked.latencyMs)/1000).toFixed(1)+' s.';
-     detail+=(app==='administracion'||app==='persona')?'\nAlcance: prueba técnica limitada; NO valida login real, sesiones, consultas con sesión, cambios de RH, confirmación, evidencias ni guardados.':
+     if(app==='familia'){
+       detail+='\nCódigo: '+String(checked.code||'SIN_CODIGO').replace(/[^A-Z0-9_]/g,'').slice(0,50)+'.';
+       if(checked.actividadesCount!=null)detail+='\nActividades disponibles: '+asNum(checked.actividadesCount)+'.';
+       detail+='\nPágina HTTP: '+(checked.paginaHttp==null?'sin respuesta':asNum(checked.paginaHttp))+
+         ' · API HTTP: '+(checked.apiHttp==null?'sin respuesta':asNum(checked.apiHttp))+'.';
+     }
+     detail+=app==='familia'?'\nAlcance: disponibilidad de GitHub Pages y API pública de actividades; no valida imágenes, enlaces individuales, botones ni navegación completa.':
+       (app==='administracion'||app==='persona')?'\nAlcance: prueba técnica limitada; NO valida login real, sesiones, consultas con sesión, cambios de RH, confirmación, evidencias ni guardados.':
        app==='dashboard'?'\nAlcance: solo consulta ejecutiva; no incluye login, informes, IA ni guardados.':
        app==='evaluacion360'?'\nAlcance: solo estructura del ciclo activo, diccionario y encabezados. No verifica evaluaciones, guardados ni promedios nocturnos.':
        '\nAlcance: solo estructura de Sheets y catálogo; no incluye acceso de participantes, respuestas ni guardados.';
      $('drawer-desc').style.whiteSpace='pre-line';
-     openDrawer((app==='administracion'||app==='persona')?data.name:app==='dashboard'?'Dashboard Ejecutivo ECO':
+     openDrawer(app==='familia'?'Familia ECO':(app==='administracion'||app==='persona')?data.name:app==='dashboard'?'Dashboard Ejecutivo ECO':
        app==='evaluacion360'?'Evaluación 360 ECO':'Autoevaluación ECO V2.0',detail,
-       checked.status==='ok'?((app==='administracion'||app==='persona')?'CONSULTA TÉCNICA PARCIAL CORRECTA':app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
+       checked.status==='ok'?(app==='familia'?'PÁGINA Y API CORRECTAS':
+         (app==='administracion'||app==='persona')?'CONSULTA TÉCNICA PARCIAL CORRECTA':
+         app==='dashboard'?'CONSULTA CORRECTA':'ESTRUCTURA CORRECTA'):
        checked.status==='warning'?'ADVERTENCIA':'ERROR DE COMPROBACIÓN');
    }else{
      var diagnostic=app==='dashboard'?dashboardDiagnostic(latest):
@@ -653,7 +734,7 @@ document.querySelectorAll('.appnode').forEach(function(node){
        (sharedOk&&sharedOk.latencyMs!=null?'\nTiempo de revisión: '+(asNum(sharedOk.latencyMs)/1000).toFixed(1)+' s.':'')+
        '\nAlcance: se comprueban Bridge, funciones esenciales y nueve hojas; NO se comprueban sesiones, acceso real, operaciones de RH, evidencias ni guardados. No se considera la aplicación funcionalmente verificada.':
        app==='familia'?
-       'Familia ECO utiliza su propio servicio de consulta. La estructura de su fuente compartida no demuestra que su portal independiente esté funcionando. Falta una prueba específica.':
+       'Familia ECO utiliza su propio servicio público. No hay una medición independiente vigente; esto no demuestra que su página esté caída. Ejecutar verificarFamiliaECO_Ahora en Monitor ECO.':
        'Todavía no hay una comprobación funcional vigente conectada para esta aplicación.';
      $('drawer-desc').style.whiteSpace='pre-line';
      openDrawer(data?data.name:'Aplicación ECO',explanation,
