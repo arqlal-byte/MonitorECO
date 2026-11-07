@@ -28,7 +28,7 @@
   var feedbackReady=false;
   var feedbackOfferUsed=false;
   var visitorTurns=0;
-  var greeting='¡Hola! Soy JARVIS, del equipo de Capital Humano. 😄 Me gusta conocer a quienes pasan por aquí. ¿Cómo te llamas? Podemos platicar de lo que quieras o echarle un vistazo a cualquier tema de ECO.';
+  var greeting='¡Hola! Soy JARVIS 😄 ¿Cómo te llamas? Me dará gusto platicar contigo.';
   var counter=0;
   var base=endpoint.split('?')[0];
 
@@ -116,7 +116,7 @@
     busy=value;
     input.readOnly=!!value;
     input.setAttribute('aria-busy',value?'true':'false');
-    if(status)status.textContent=value?'JARVIS está preparando su respuesta…':'JARVIS ECO · Capital Humano';
+    if(status)status.textContent=value?'JARVIS está pensando…':'JARVIS ECO · Capital Humano';
   }
   function onSubmit(event){
     // No permitir que el asistente antiguo simule una respuesta de IA cuando el backend falla.
@@ -139,7 +139,7 @@
     rememberVisitorName(q);
     input.value='';
     append(q,'question');
-    var pendingAnswer=append('Déjame revisarlo…','answer');
+    var pendingAnswer=append('Pensando…','answer');
     var previous=historyParam();
     visitorTurns++;
     var params={question:q,history:previous,visitorName:visitorName,visitorKey:visitorKey};
