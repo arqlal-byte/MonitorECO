@@ -121,6 +121,28 @@ body.paused *,body.paused *:before,body.paused *:after{animation-play-state:paus
 body.eco-chat-visible{overflow:hidden}
 @media(max-width:540px){.eco-chat-header{padding:15px 13px 11px}.eco-chat-window{width:100vw}.eco-chat-messages{padding:12px}.eco-chat-form{padding:12px}.eco-chat-examples{padding:8px 12px}}
 
+
+/* Avatar animado del analista: decoración visual, sin tareas de IA autónoma. */
+.ai-assistant-layout{display:flex;gap:8px;align-items:center;position:relative;z-index:1}
+.ai-assistant-info{min-width:0;flex:1}
+.eco-bot-stage{position:relative;flex:0 0 105px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:115px;margin:-6px -5px 0 0}
+.eco-bot{position:relative;z-index:1;width:91px;height:99px;filter:drop-shadow(0 4px 12px #00d9ff70);animation:ecoBotFloat 4.2s ease-in-out infinite}
+.eco-bot-orbit{position:absolute;z-index:0;top:11px;left:12px;width:81px;height:81px;border:1px dashed #48eaff66;border-radius:50%;animation:ecoBotOrbit 16s linear infinite}
+.eco-bot-eyes{transform-origin:65px 62px;animation:ecoBotEyes 6.5s ease-in-out infinite}
+.eco-bot-antenna{transform-origin:65px 23px;animation:ecoBotAntenna 3.8s ease-in-out infinite}
+.eco-bot-heart{animation:ecoBotSignal 2.2s ease-in-out infinite}
+.eco-bot-caption{margin-top:-4px;z-index:2;font-size:8px;font-weight:800;letter-spacing:1px;color:#a3d6e8;white-space:nowrap}
+.eco-bot-stage[data-live="true"] .eco-bot-caption{color:#7cffe5}
+.eco-bot-stage[data-live="true"] .eco-bot-orbit{border-color:#39f2d2aa}
+.eco-chat-launch{z-index:2}
+@keyframes ecoBotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes ecoBotOrbit{to{transform:rotate(360deg)}}
+@keyframes ecoBotEyes{0%,45%,49%,100%{transform:scaleY(1)}47%{transform:scaleY(.09)}}
+@keyframes ecoBotAntenna{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes ecoBotSignal{0%,100%{opacity:1}50%{opacity:.25}}
+@media(max-width:420px){.eco-bot-stage{flex-basis:82px;min-height:95px}.eco-bot{width:72px;height:84px}.eco-bot-orbit{width:65px;height:65px}.eco-bot-caption{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.eco-bot,.eco-bot-orbit,.eco-bot-eyes,.eco-bot-antenna,.eco-bot-heart{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -181,8 +203,10 @@ body.eco-chat-visible{overflow:hidden}
         <polygon points="108,100 160,73 213,100 160,126" fill="#0ab3ff66" stroke="#82eeff" stroke-width="2.5"/>
         <polygon points="108,100 160,126 160,191 108,165" fill="url(#hubsurface)" stroke="#26caff" stroke-width="2"/>
         <polygon points="160,126 213,100 213,165 160,191" fill="url(#side)" stroke="#26caff" stroke-width="2"/>
-        <text x="160" y="149" fill="#e7fbff" font-size="20" text-anchor="middle" font-weight="900" letter-spacing="1">NÚCLEO</text>
-        <text x="160" y="166" fill="#a5dfff" font-size="9" text-anchor="middle" letter-spacing="1.5">MONITOR</text>
+        <svg x="111" y="129" width="98" height="38" viewBox="0 0 545 196" preserveAspectRatio="xMidYMid meet" overflow="hidden">
+          <title>Logotipo oficial ECO, Embotelladora de Colima</title>
+          <image x="0" y="0" width="1270" height="196" href="./assets/eco-cocacola-oficial.png" preserveAspectRatio="none" />
+        </svg>
         <g stroke="#6deaff" stroke-width="2" opacity=".95"><path d="M87 169 L60 158 L60 111"/><path d="M233 172 L259 159 L259 103"/><path d="M160 73 L160 35"/></g>
         <g fill="#34dafa"><circle cx="60" cy="111" r="5"/><circle cx="259" cy="103" r="5"/><circle cx="160" cy="35" r="6"/></g>
         <g fill="#31ecff" opacity=".85"><rect x="120" y="202" width="7" height="12"/><rect x="133" y="208" width="7" height="12"/><rect x="196" y="208" width="7" height="12"/><rect x="183" y="214" width="7" height="12"/></g>
@@ -204,7 +228,45 @@ body.eco-chat-visible{overflow:hidden}
 </section>
 <section class="bottom-grid" aria-label="Información detallada demostrativa">
   <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">DATOS SIMULADOS</span></div><div class="latency" id="latency-list"></div></article>
-  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Analista contextual <span class="aux">INDICADORES</span></div><div class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</div><h3 id="ai-title">Consultas contextuales</h3><p id="ai-description">Puedes preguntar por el estado de Sheets, Dashboard y las aplicaciones aún sin prueba.</p><p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Preguntar sobre los indicadores</button><div class="ai-wave" aria-hidden="true"></div></article>
+  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Analista contextual <span class="aux">INDICADORES</span></div><div class="ai-assistant-layout">
+    <div class="ai-assistant-info">
+      <div class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</div>
+      <h3 id="ai-title">Consultas contextuales</h3>
+      <p id="ai-description">Puedes preguntar por el estado de Sheets, Dashboard y las aplicaciones aún sin prueba.</p>
+      <p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p>
+    </div>
+    <div class="eco-bot-stage" title="Mascota visual del analista; no representa una IA autónoma">
+      <span class="eco-bot-orbit" aria-hidden="true"></span>
+      <svg class="eco-bot" viewBox="0 0 130 146" role="img" aria-label="Pequeño robot animado del Analista Monitor ECO">
+        <defs>
+          <linearGradient id="ecoBotShell" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#d6fbff"/><stop offset=".43" stop-color="#79dfff"/><stop offset="1" stop-color="#1676b9"/>
+          </linearGradient>
+          <linearGradient id="ecoBotHead" x1="0" y1="0" x2="0" y2="1">
+            <stop stop-color="#d7f8ff"/><stop offset=".55" stop-color="#5cc3f4"/><stop offset="1" stop-color="#1a6cb2"/>
+          </linearGradient>
+        </defs>
+        <g class="eco-bot-antenna"><path d="M65 22V13" stroke="#76eaff" stroke-width="5" stroke-linecap="round"/><circle cx="65" cy="11" r="6.5" fill="#36eaff" stroke="#dcffff" stroke-width="2"/></g>
+        <ellipse cx="65" cy="139" rx="36" ry="5" fill="#06bbf0" opacity=".24"/>
+        <g class="eco-bot-body">
+          <rect x="43" y="102" width="44" height="27" rx="16" fill="url(#ecoBotShell)" stroke="#d3faff" stroke-width="2"/>
+          <rect x="54" y="107" width="22" height="11" rx="5.5" fill="#083d70" stroke="#58e8fb" stroke-width="1.5"/>
+          <circle cx="65" cy="112.5" r="3" fill="#53fbd7" class="eco-bot-heart"/>
+          <path d="M41 112L32 119M89 112L98 119" stroke="#86e9ff" stroke-width="10" stroke-linecap="round"/>
+          <path d="M55 128L51 136M75 128L79 136" stroke="#7fcdf5" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g class="eco-bot-head">
+          <rect x="22" y="24" width="86" height="79" rx="31" fill="url(#ecoBotHead)" stroke="#d6fcff" stroke-width="3"/>
+          <rect x="32" y="38" width="66" height="52" rx="21" fill="#08203e" stroke="#1cbfee" stroke-width="2.3"/>
+          <path d="M37 45Q54 35 89 46" stroke="#8defff" stroke-width="2" fill="none" opacity=".5"/>
+          <g class="eco-bot-eyes" fill="#7dffff"><ellipse cx="51" cy="62" rx="7" ry="9"/><ellipse cx="79" cy="62" rx="7" ry="9"/></g>
+          <path class="eco-bot-smile" d="M56 78Q65 84 74 78" fill="none" stroke="#70e8fa" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="25" cy="70" r="5" fill="#54eaff"/><circle cx="105" cy="70" r="5" fill="#54eaff"/>
+        </g>
+      </svg>
+      <span class="eco-bot-caption" id="eco-bot-caption">EN ESPERA</span>
+    </div>
+  </div><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Preguntar sobre los indicadores</button><div class="ai-wave" aria-hidden="true"></div></article>
   <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
 </section>
 <footer class="footer"><span>Monitor ECO V1 · Prototipo visual independiente · No conectado a Apps Script, Sheets ni Drive.</span><strong>NINGÚN ESTADO O NÚMERO CORRESPONDE A UNA VERIFICACIÓN REAL</strong></footer>
