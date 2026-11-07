@@ -293,6 +293,69 @@ body.eco-chat-visible{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){.network-topology:after{animation:none}}
 
+
+/* 2026-11-07: tarjetas sin superposición y texto de diagnóstico al pie. */
+.network-topology{height:650px!important;min-height:650px!important}
+.network-topology .appnode{
+ display:grid;grid-template-columns:26px minmax(0,1fr);
+ grid-template-areas:"icon tag" "name name" "status status" "time time";
+ align-content:start;align-items:center;column-gap:8px;row-gap:5px;
+ width:clamp(174px,25%,210px);min-height:135px;height:auto;
+ padding:11px 11px 13px;box-sizing:border-box;text-align:left;
+ overflow-wrap:anywhere;word-break:normal;
+}
+.network-topology .appnode .node-icon{
+ grid-area:icon;position:static;top:auto;left:auto;
+ width:26px;height:26px;display:grid;font-size:15px;
+}
+.network-topology .appnode .node-tag{
+ grid-area:tag;position:static;top:auto;right:auto;
+ display:block;max-width:100%;min-width:0;
+ font-size:9px;font-weight:750;line-height:1.25;
+ white-space:normal;overflow-wrap:anywhere;
+ color:#9bc8dc;text-align:left;
+}
+.network-topology .appnode .node-name{
+ grid-area:name;position:static;min-width:0;min-height:0;
+ font-size:12px;line-height:1.28;white-space:normal;
+ font-weight:850;color:#f0faff;margin-top:1px;
+}
+.network-topology .appnode .node-status{
+ grid-area:status;display:flex;gap:6px;align-items:flex-start;
+ margin:0;min-width:0;font-size:10px;line-height:1.35;
+ white-space:normal;overflow-wrap:anywhere;
+}
+.network-topology .appnode .node-status .dot{margin-top:4px;flex:none}
+.network-topology .appnode .node-time{
+ grid-area:time;min-width:0;margin:0;font-size:9.5px;
+ line-height:1.32;white-space:normal;overflow-wrap:anywhere;
+}
+.network-topology .appnode.left1,.network-topology .appnode.right1{top:9%}
+.network-topology .appnode.left2,.network-topology .appnode.right2{top:39%}
+.network-topology .appnode.left3,.network-topology .appnode.right3{top:69%}
+.dashboard > .notice{
+ display:block;margin:13px 0 2px;width:100%;padding:10px 12px;
+ border-top:1px solid #17446b;background:#071c32b8;
+ color:#a9c6d9;font-size:10px;line-height:1.65;letter-spacing:0;
+ white-space:normal;overflow-wrap:anywhere;text-align:left;
+}
+@media(max-width:680px){
+ .network-topology{height:740px!important;min-height:740px!important}
+ .network-topology .appnode{width:calc(50% - 10px);min-height:140px;padding:9px 8px 11px;row-gap:4px}
+ .network-topology .appnode .node-name{font-size:11px}
+ .network-topology .appnode .node-status{font-size:9.5px}
+ .network-topology .appnode .node-tag{font-size:8.5px}
+ .network-topology .appnode.left1,.network-topology .appnode.right1{top:8%}
+ .network-topology .appnode.left2,.network-topology .appnode.right2{top:38%}
+ .network-topology .appnode.left3,.network-topology .appnode.right3{top:68%}
+}
+@media(max-width:390px){
+ .network-topology{height:770px!important;min-height:770px!important}
+ .network-topology .appnode{width:calc(50% - 8px)}
+ .network-topology .appnode .node-name{font-size:10px}
+ .network-topology .appnode .node-status{font-size:9px}
+}
+
 </style>
 </head>
 <body>
@@ -325,7 +388,7 @@ body.eco-chat-visible{overflow:hidden}
   </div>
 </section>
  <div class="network-topology">
-    <div class="network-label">◈ TOPOLOGÍA DEL <strong>ECOSISTEMA ECO</strong> · DEMO</div>
+    <div class="network-label">◈ TOPOLOGÍA DEL <strong>ECOSISTEMA ECO</strong></div>
     <svg class="streams" viewBox="0 0 800 520" preserveAspectRatio="none" aria-hidden="true">
       <path class="stream-path" d="M400 255 L260 110 L145 110"/><path class="stream-flow" d="M400 255 L260 110 L145 110"/>
       <path class="stream-path" d="M400 255 L265 260 L145 260"/><path class="stream-flow" d="M400 255 L265 260 L145 260"/>
@@ -356,7 +419,7 @@ body.eco-chat-visible{overflow:hidden}
         <g fill="#34dafa"><circle cx="60" cy="111" r="5"/><circle cx="259" cy="103" r="5"/><circle cx="160" cy="35" r="6"/></g>
         <g fill="#31ecff" opacity=".85"><rect x="120" y="202" width="7" height="12"/><rect x="133" y="208" width="7" height="12"/><rect x="196" y="208" width="7" height="12"/><rect x="183" y="214" width="7" height="12"/></g>
       </svg>
-      <div class="hub-base">CENTRO DE DATOS · ESQUEMA CONCEPTUAL</div>
+      <div class="hub-base">CENTRO DE DATOS</div>
     </div>
     <button class="appnode left1" data-app="0"><span class="node-icon">▥</span><span class="node-tag">PENDIENTE</span><div class="node-name">Dashboard Ejecutivo ECO</div><div class="node-status"><span class="dot"></span> Sin medición reciente</div><div class="node-time">Esperando prueba automática</div></button>
     <button class="appnode left2" data-app="2"><span class="node-icon">♧</span><span class="node-tag">PENDIENTE</span><div class="node-name">Evaluación 360 ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
@@ -368,15 +431,13 @@ body.eco-chat-visible{overflow:hidden}
 </main>
 </section>
 <div class="controls">
-  <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
   <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
   <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
   <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
-  <button class="ctrl danger" id="incident" aria-pressed="false">Simular incidencia</button>
   <button class="ctrl outline" id="pause">Pausar animaciones</button>
 </div>
 
-<section class="metrics" aria-label="Indicadores generales; sin resultados simulados mientras se conecta">
+<section class="metrics" aria-label="Indicadores generales del monitor">
   <div class="kpi major"><div class="gauge"><span>—</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">SIN DATOS CONFIRMADOS</strong><div class="hint">Esperando comprobación de fuentes</div></div></div>
   <div class="kpi"><div class="symbol">◈</div><div class="number">6</div><div class="hint">Aplicaciones objetivo</div></div>
   <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">0</div><div class="hint">Aplicaciones verificadas</div></div>
@@ -389,86 +450,70 @@ body.eco-chat-visible{overflow:hidden}
 
 <section class="report-panels" aria-label="Paneles de resultados del monitor">
   <div class="rail left-rail">
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">7 días · DEMO</span></div>
-      <svg class="line-chart" id="stability-chart" viewBox="0 0 300 100" role="img" aria-label="Gráfica demostrativa de estabilidad"><line class="gridline" x1="4" x2="296" y1="20" y2="20"/><line class="gridline" x1="4" x2="296" y1="50" y2="50"/><line class="gridline" x1="4" x2="296" y1="80" y2="80"/><path class="chart-shadow" id="line-shadow"/><path class="chart-line" id="line-path"/><g id="chart-points"></g></svg>
-      <div class="days" id="chart-days"><span>Sáb</span><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span></div>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">Sin medición</span></div>
+      <svg class="line-chart" id="stability-chart" viewBox="0 0 300 100" role="img" aria-label="Estabilidad registrada por Monitor ECO"><line class="gridline" x1="4" x2="296" y1="20" y2="20"/><line class="gridline" x1="4" x2="296" y1="50" y2="50"/><line class="gridline" x1="4" x2="296" y1="80" y2="80"/><path class="chart-shadow" id="line-shadow"/><path class="chart-line" id="line-path"/><g id="chart-points"></g></svg>
+      <div class="days" id="chart-days">Sin historial</div>
     </article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Incidencias por día <span class="aux">MUESTRA</span></div><div class="bars" id="incidence-bars"></div></article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">MUESTRA</span></div><div class="event-content"><div class="donut"><div class="donut-inner">8<small>eventos demo</small></div></div><div class="event-legend"><div class="legend-row"><i class="legend-dot" style="background:#39e27b"></i>Normal <b>72%</b></div><div class="legend-row"><i class="legend-dot" style="background:#16cbff"></i>Procesos <b>17%</b></div><div class="legend-row"><i class="legend-dot" style="background:#fbc54e"></i>Advertencias <b>7%</b></div><div class="legend-row"><i class="legend-dot" style="background:#f05b70"></i>Incidencias <b>4%</b></div></div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Incidencias por día <span class="aux">SIN DATOS</span></div><div class="bars" id="incidence-bars"></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">SIN DATOS</span></div><div class="event-content">Sin datos de eventos</div></div></article>
   </div>
   <aside class="rail right-rail">
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">DEMO</span></div><div class="source-wrap"><div class="source-donut"><div><strong>12</strong><span>Fuentes demo</span></div></div><div class="source-counts"><span>● Operativas <b>12</b></span><span style="color:#ffdb80">▲ Advertencia <b>0</b></span><span style="color:#ff8493">✕ Error <b>0</b></span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Procesos automáticos <span class="aux">DEMO</span></div><div class="process-list"><div class="process"><i>✓</i><span>Promedios</span><time>05:00</time></div><div class="process"><i>✓</i><span>Actualización de datos</span><time>06:15</time></div><div class="process"><i>✓</i><span>Generación de informes</span><time>07:00</time></div><div class="process"><i>✓</i><span>Respaldos</span><time>01:00</time></div></div></article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Actividad reciente <span class="aux">SIMULADA</span></div><div class="activity"><div class="activity-row"><span class="dot"></span><time>18:58</time><span>Mi Persona · evidencia recibida</span></div><div class="activity-row"><span class="dot"></span><time>18:46</time><span>Evaluación 360 · envío guardado</span></div><div class="activity-row"><span class="dot"></span><time>18:30</time><span>Dashboard · PDF generado</span></div><div class="activity-row"><span class="dot"></span><time>18:15</time><span>Autoevaluación · concluida</span></div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">SIN MEDICIÓN</span></div><div class="source-wrap"><div class="source-donut"><div><strong>—</strong><span>Sin lectura</span></div></div><div class="source-counts"><span>Sin datos disponibles</span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Procesos automáticos <span class="aux">SIN MEDICIÓN</span></div><div class="process-list"><div class="process">Esperando mediciones reales</div></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Actividad reciente <span class="aux">SIN MEDICIÓN</span></div><div class="activity"><div class="activity-row"><span>Sin registros de actividad comprobados</span></div></div></article>
   </aside>
 </section>
-<section class="bottom-grid" aria-label="Información detallada demostrativa">
-  <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">DATOS SIMULADOS</span></div><div class="latency" id="latency-list"></div></article>
+<section class="bottom-grid" aria-label="Información detallada del monitor">
+  <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">SIN MEDICIÓN</span></div><div class="latency" id="latency-list"></div></article>
   
-  <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
+  <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">SIN MEDICIÓN</span></div><div class="daily"><p>Sin información verificada</p></div></div></article>
 </section>
 <footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
+<div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
 </div>
-<div class="demo-watermark">LECTURA PENDIENTE</div>
-<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p id="drawer-sources"><strong>Fuente:</strong> Mediciones técnicas publicadas por Monitor ECO.</p><p class="tagline" id="drawer-measure-note" hidden>Sin una medición vigente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
+<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Sin medición</span></p><p id="drawer-sources"><strong>Fuente:</strong> Mediciones técnicas publicadas por Monitor ECO.</p><p class="tagline" id="drawer-measure-note" hidden>Sin una medición vigente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
 <script src="./config.js?v=20261106-conexion1"></script>
 <script>
 (function(){
-'use strict';
-var apps=[
-{name:'Dashboard Ejecutivo ECO',note:'Consultas, informes PDF, IA integrada y fuentes ejecutivas',time:3.2},
-{name:'Autoevaluación ECO',note:'Acceso, captura, resultados y almacenamiento de autoevaluaciones',time:2.8},
-{name:'Evaluación 360 ECO',note:'Trabajadores, líderes, duplicados, guardado y promedios nocturnos',time:4.1},
-{name:'Centro de Administración ECO',note:'Accesos, operaciones administrativas y conexiones de datos',time:3.5},
-{name:'Mi Persona ECO',note:'Actividades, evidencias, sesiones y almacenamiento',time:3.0},
-{name:'Familia ECO',note:'Operaciones y verificaciones a confirmar con código vigente',time:3.4}
-];
-var incident=false,range='7d',paused=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(paused)document.body.classList.add('paused');
-function $(id){return document.getElementById(id);}
-function clock(){var now=new Date();$('fecha').textContent=new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(now);$('hora').textContent=new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}).format(now)+' h';}
-clock();setInterval(clock,30000);
-function chart(){
- var series={ '24h':[99,99.6,98.9,99.5,99.4,99.8,99.8],'7d':[99.0,99.1,99.6,99.8,99.7,99.9,99.8],'30d':[97.5,98.2,98.1,98.9,99.2,99.5,99.8]}[range].slice();
- if(incident)series[series.length-1]=96.5;
- var path=series.map(function(v,i){return(i?'L':'M')+(10+i*46.5)+' '+(90-(v-95)*17).toFixed(1);}).join(' ');
- $('line-path').setAttribute('d',path);$('line-shadow').setAttribute('d',path);
- $('chart-points').innerHTML=series.map(function(v,i){return'<circle class="chart-dot" cx="'+(10+i*46.5)+'" cy="'+(90-(v-95)*17).toFixed(1)+'" r="4"/>';}).join('');
- var bars=range==='24h'?[0,1,0,1,0,0,1]:range==='30d'?[2,2,3,1,2,2,1]:[2,1,3,1,0,1,0];
- if(incident)bars[bars.length-1]=3;
- var days=range==='24h'?['00h','04h','08h','12h','16h','20h','24h']:range==='30d'?['S1','S2','S3','S4','S5','S6','S7']:['Sáb','Dom','Lun','Mar','Mié','Jue','Vie'];
- $('incidence-bars').innerHTML=bars.map(function(n,i){return'<div class="bar-wrap"><em>'+n+'</em><div class="bar" style="--height:'+(Math.max(2,n)*22)+'%;animation-delay:'+(i*.08)+'s"></div></div>';}).join('');
- $('chart-days').innerHTML=days.map(function(d){return'<span>'+d+'</span>';}).join('');
- $('period-label').textContent=({'24h':'24 horas','7d':'7 días','30d':'30 días'})[range]+' · DEMO';
- document.querySelectorAll('[data-range]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-range')===range));});
-}
-function latency(){
- $('latency-list').innerHTML=apps.map(function(a,i){var t=a.time+(incident&&i===2?4.8:0);return'<div class="lat-row"><span>'+a.name.replace(' ECO','')+'</span><div class="lat-track"><span style="--w:'+(t/10*100).toFixed(0)+'%;animation-delay:'+(i*.1)+'s"></span></div><b>'+t.toFixed(1)+' s</b></div>';}).join('');
-}
-function states(){
- $('healthy').textContent=incident?'5':'6';$('warnings').textContent=incident?'1':'0';$('general-state').textContent=incident?'ALERTA DE EJEMPLO':'ESCENARIO ESTABLE';
- document.querySelectorAll('.appnode').forEach(function(node){
- var selected=incident&&Number(node.getAttribute('data-app'))===2;
- var dot=node.querySelector('.dot'),text=node.querySelector('.node-status'),time=node.querySelector('.node-time');
- dot.classList.toggle('warn',selected);
- text.lastChild.textContent=selected?' Advertencia simulada':' Operativo (ejemplo)';
- time.textContent='Respuesta: '+(apps[Number(node.getAttribute('data-app'))].time+(selected?4.8:0)).toFixed(1)+' s';
- });
- $('ai-title').textContent=incident?'Ejemplo: demora detectada':'Escenario de estabilidad';
- $('ai-description').textContent=incident?'SIMULACIÓN: el guardado de Evaluación 360 superó el umbral de ejemplo. Una IA conectada revisaría registros y concurrencia antes de proponer una causa. No es una incidencia real.':'Este panel mostrará diagnósticos respaldados por registros técnicos. La IA todavía no está conectada y no ha comprobado ninguna aplicación.';
- $('incident').textContent=incident?'Restablecer demostración':'Simular incidencia';
- $('incident').setAttribute('aria-pressed',String(incident));
- chart();latency();
-}
-document.querySelectorAll('[data-range]').forEach(function(b){b.addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;range=b.getAttribute('data-range');chart();});});
-$('incident').addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;incident=!incident;states();});
-$('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';
-$('pause').addEventListener('click',function(){paused=!paused;document.body.classList.toggle('paused',paused);$('pause').textContent=paused?'Reanudar animaciones':'Pausar animaciones';});
-function openDrawer(title,desc,state){$('drawer-title').textContent=title;$('drawer-desc').textContent=desc;$('drawer-state').textContent=state;$('drawer').hidden=false;$('close-drawer').focus();}
-document.querySelectorAll('.appnode').forEach(function(b){b.addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;var i=Number(b.getAttribute('data-app')),a=apps[i];openDrawer(a.name,a.note+'. El valor de respuesta ('+a.time.toFixed(1)+' s) es demostrativo.',incident&&i===2?'Advertencia simulada':'Operativo simulado');});});
-$('sources').addEventListener('click',function(){if(window.ECO_MONITOR_ENDPOINT)return;openDrawer('Datos y Drive','Las 12 fuentes indicadas en esta pantalla son un ejemplo visual. Todavía no existe un inventario de fuentes conectadas ni se han leído datos de las seis aplicaciones.','Sin conexión real');});
-$('close-drawer').addEventListener('click',function(){$('drawer').hidden=true;});$('drawer').addEventListener('click',function(e){if(e.target===$('drawer'))$('drawer').hidden=true;});document.addEventListener('keydown',function(e){if(e.key==='Escape')$('drawer').hidden=true;});
-if(!window.ECO_MONITOR_ENDPOINT)states();
+ 'use strict';
+ var $=function(id){return document.getElementById(id);};
+ var paused=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+ if(paused)document.body.classList.add('paused');
+ function clock(){
+  var d=new Date();
+  var date=$('fecha'),time=$('hora');
+  if(date)date.textContent=new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(d);
+  if(time)time.textContent=new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d)+' h';
+ }
+ clock();setInterval(clock,30000);
+ var pause=$('pause');
+ if(pause){
+  pause.textContent=paused?'Reanudar animaciones':'Pausar animaciones';
+  pause.addEventListener('click',function(){
+   paused=!paused;
+   document.body.classList.toggle('paused',paused);
+   pause.textContent=paused?'Reanudar animaciones':'Pausar animaciones';
+  });
+ }
+ function unavailable(){
+  var title=$('drawer-title'),desc=$('drawer-desc'),state=$('drawer-state'),drawer=$('drawer');
+  if(!drawer)return;
+  if(title)title.textContent='Monitor ECO';
+  if(desc)desc.textContent='No hay mediciones disponibles. Revisa la conexión con el servicio de monitoreo.';
+  if(state)state.textContent='SIN MEDICIÓN';
+  drawer.hidden=false;
+  var close=$('close-drawer');if(close)close.focus();
+ }
+ if(!window.ECO_MONITOR_ENDPOINT){
+  var n=document.querySelector('.notice');
+  if(n)n.textContent='◆ Monitor sin conexión a las mediciones. No se mostrarán cifras sin comprobar.';
+  document.querySelectorAll('.appnode').forEach(function(node){node.addEventListener('click',unavailable);});
+  var source=$('sources');if(source)source.addEventListener('click',unavailable);
+ }
+ var close=$('close-drawer'),drawer=$('drawer');
+ if(close)close.addEventListener('click',function(){if(drawer)drawer.hidden=true;});
+ if(drawer)drawer.addEventListener('click',function(e){if(e.target===drawer)drawer.hidden=true;});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer)drawer.hidden=true;});
 })();
 </script>
 <script src="./monitor-live.js?v=20261107-familia1"></script>
