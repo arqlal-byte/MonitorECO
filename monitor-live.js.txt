@@ -14,10 +14,66 @@ var $=function(x){return document.getElementById(x);};
 var esc=function(x){return String(x===undefined?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
 var asNum=function(n){var value=Number(n);return isFinite(value)&&value>=0?value:0;};
 var stateLabel=function(status){return status==='ok'?'Correcta':status==='warning'?'Advertencia':status==='error'?'Error':'Sin comprobar';};
+// Cuando existe un endpoint, NUNCA dejar visibles las cifras ficticias del diseño.
+function neutral(message){
+ var mode=document.querySelector('.demo-pill');
+ if(mode){mode.textContent='● ESPERANDO MEDICIÓN';mode.style.color='#ffd98e';mode.style.borderColor='#b78b3c';}
+ var watermark=document.querySelector('.demo-watermark');
+ if(watermark){watermark.textContent='CONEXIÓN PENDIENTE · APPS SIN PRUEBA';watermark.style.color='#ffd98e';}
+ var notice=document.querySelector('.notice');
+ if(notice)notice.textContent='◆ '+(message||'Consultando el servicio de monitoreo de Sheets...');
+ $('general-state').textContent='SIN DATOS CONFIRMADOS';
+ $('healthy').textContent='0';$('warnings').textContent='—';$('failures').textContent='—';
+ var gauge=document.querySelector('.gauge span');if(gauge)gauge.textContent='PEND.';
+ var kpis=document.querySelectorAll('.metrics>.kpi');
+ if(kpis.length>=8){
+   kpis[0].querySelector('.hint').textContent='Esperando comprobación de fuentes';
+   kpis[2].querySelector('.hint').textContent='Apps verificadas';
+   kpis[3].querySelector('.hint').textContent='Alertas apps sin comprobar';
+   kpis[4].querySelector('.hint').textContent='Fallas apps sin comprobar';
+   kpis[5].querySelector('.number').textContent='—';
+   kpis[5].querySelector('.hint').textContent='Sheets sin datos';
+   kpis[6].querySelector('.number').textContent='—';
+   kpis[6].querySelector('.hint').textContent='Procesos sin verificar';
+   kpis[7].querySelector('.number').textContent='—';
+   kpis[7].querySelector('.hint').textContent='Disponibilidad no medida';
+ }
+ document.querySelectorAll('.appnode').forEach(function(n){
+   var dot=n.querySelector('.dot'),status=n.querySelector('.node-status'),time=n.querySelector('.node-time');
+   if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
+   if(status)status.lastChild.textContent=' Sin prueba funcional';
+   if(time)time.textContent='Aplicación no instrumentada';
+   n.style.borderColor='#256181';
+ });
+ var sf=document.querySelector('.right-rail .panel .source-wrap');
+ if(sf)sf.innerHTML='<p style="padding:10px;color:#bcdaf1">No hay mediciones confirmadas del servicio de Sheets.</p>';
+ var sourceAux=document.querySelector('.right-rail .panel .panel-title .aux');if(sourceAux)sourceAux.textContent='SIN RESPUESTA';
+ var process=document.querySelector('.process-list');
+ if(process)process.innerHTML='<p style="color:#bcdaf1">No se verifican todavía procesos ni disparadores de otras aplicaciones.</p>';
+ var activity=document.querySelector('.activity');
+ if(activity)activity.innerHTML='<p style="color:#bcdaf1">Sin registros de actividad conectados.</p>';
+ var latency=$('latency-list');if(latency)latency.innerHTML='<p style="color:#bcdaf1">Sin tiempos de lectura confirmados.</p>';
+ var eventPanel=document.querySelector('.event-content');if(eventPanel)eventPanel.innerHTML='<p style="color:#bcdaf1">Sin muestras válidas.</p>';
+ ['line-path','line-shadow'].forEach(function(id){var el=$(id);if(el)el.setAttribute('d','');});
+ var points=$('chart-points');if(points)points.innerHTML='';
+ var days=$('chart-days');if(days)days.textContent='Esperando revisiones reales';
+ var bars=$('incidence-bars');if(bars)bars.innerHTML='';
+ var aiTitle=$('ai-title');if(aiTitle)aiTitle.textContent='IA todavía sin conectar';
+ var aiDesc=$('ai-description');if(aiDesc)aiDesc.textContent='Aún no hay mediciones reales confirmadas.';
+ var daily=document.querySelector('.daily');if(daily)daily.innerHTML='<p style="color:#bcdaf1">Datos de actividad no conectados.</p>';
+ var footer=document.querySelector('.footer');
+ if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Conexión con Apps Script configurada; consulta pendiente.</span><strong>NINGUNA APLICACIÓN TIENE PRUEBA FUNCIONAL CONECTADA</strong>';
+ var incident=$('incident');if(incident){incident.disabled=true;incident.textContent='Simulación deshabilitada';}
+ document.querySelectorAll('[data-range]').forEach(function(b){b.disabled=true;});
+}
+
 function apply(data){
- if(!data||data.schema!==1||!Array.isArray(data.sources)||!data.counts)return;
+ if(!data||data.schema!==1||!Array.isArray(data.sources)||!data.counts){neutral('Respuesta del monitor inválida');return;}
+ if(!data.connected||!data.lastCheck){latest=null;neutral('Servicio accesible, pero todavía sin una medición registrada');return;}
  latest=data;
- var counts=data.counts||{},stale=!!data.stale;
+ var counts=data.counts||{},lastMs=Date.parse(data.lastCheck);
+ var stale=!!data.stale||!isFinite(lastMs)||Date.now()-lastMs>15*60*1000;
+ latest.stale=stale;
  var mode=document.querySelector('.demo-pill');
  if(mode){
    mode.textContent=stale?'● DATOS DESACTUALIZADOS':'● DATOS REALES DE SHEETS';
@@ -33,13 +89,15 @@ function apply(data){
  }
  $('general-state').textContent=stale?'DATOS DESACTUALIZADOS':asNum(counts.error)>0?'FUENTES CON ERRORES':asNum(counts.warning)>0?'FUENTES CON ALERTAS':'FUENTES SIN ALERTAS';
  $('healthy').textContent='0';
- $('warnings').textContent='0';
- $('failures').textContent='0';
+ $('warnings').textContent='—';
+ $('failures').textContent='—';
+ var gauge=document.querySelector('.gauge span');if(gauge)gauge.textContent='SHEETS';
  var kpis=document.querySelectorAll('.metrics>.kpi');
  if(kpis.length>=8){
+   kpis[0].querySelector('.hint').textContent='Solo metadatos de Sheets; apps sin prueba';
    kpis[2].querySelector('.hint').textContent='Apps verificadas';
-   kpis[3].querySelector('.hint').textContent='Apps con advertencia';
-   kpis[4].querySelector('.hint').textContent='Apps con falla';
+   kpis[3].querySelector('.hint').textContent='Alertas apps sin comprobar';
+   kpis[4].querySelector('.hint').textContent='Fallas apps sin comprobar';
    kpis[5].querySelector('.number').textContent=asNum(counts.total);
    kpis[5].querySelector('.hint').textContent='Sheets revisados';
    kpis[6].querySelector('.number').textContent='—';
@@ -163,10 +221,10 @@ function poll(){
 }
 function handleFailure(message){
  if(pending){clearTimeout(pending.timeout);pending.script.remove();pending=null;}
- var notice=document.querySelector('.notice');
- if(notice)notice.textContent='⚠ '+message+(latest?' Último registro disponible: '+latest.lastCheck:' Se conserva la vista de demostración.');
  if(latest){latest.stale=true;apply(latest);}
+ else neutral('⚠ '+message+' Las cifras ilustrativas no se muestran.');
 }
+neutral('Consultando el servicio de monitoreo de Sheets...');
 poll();
 setInterval(poll,5*60*1000);
 })();
