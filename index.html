@@ -94,6 +94,33 @@ body.paused *,body.paused *:before,body.paused *:after{animation-play-state:paus
 @media(max-width:680px){.dashboard{padding:10px}.header{display:flex;flex-direction:column;gap:7px}.corporate img{max-width:250px;max-height:55px}.brand-title h1{font-size:27px}.header-right{justify-content:center}.controls{justify-content:center}.notice{flex:1 0 100%;text-align:center;justify-content:center}.metrics{grid-template-columns:repeat(2,1fr)}.kpi.major{grid-column:span 2}.kpi{height:81px}.main-grid{display:flex;flex-direction:column}.network-board{order:0;min-height:580px}.rail{order:1;display:grid;grid-template-columns:1fr;grid-template-rows:none;gap:8px}.left-rail{order:1}.right-rail{order:2}.panel{min-height:135px}.appnode{width:165px;min-height:88px}.hub{width:190px;height:250px}.appnode.left1{top:11%;left:0}.appnode.left2{top:42%;left:0}.appnode.left3{top:73%;left:0}.appnode.right1{top:11%;right:0}.appnode.right2{top:42%;right:0}.appnode.right3{top:73%;right:0}.bottom-grid{grid-template-columns:1fr}.bottom-grid .ai-panel{grid-column:auto}.footer{flex-direction:column}.demo-watermark{bottom:7px;right:7px}}
 @media(max-width:460px){.network-board{min-height:640px}.hub{top:47%;width:140px;height:205px}.appnode{width:calc(50% - 6px);font-size:10px;min-height:92px;padding:9px 5px 7px}.appnode .node-icon{display:none}.appnode .node-name{font-size:9px;min-height:30px}.appnode .node-status{font-size:9px;line-height:1.1}.appnode.left1,.appnode.right1{top:8%}.appnode.left2,.appnode.right2{top:74%}.appnode.left3,.appnode.right3{top:88%}.node-time{font-size:9px}.node-tag{font-size:8px;right:4px}.hub-base{font-size:7px}.network-label{font-size:9px}.bottom-grid .panel{min-height:160px}.lat-row{grid-template-columns:111px 1fr 32px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
+
+/* Analista contextual Monitor ECO: conserva la identidad visual y no altera paneles existentes. */
+.eco-chat-launch{margin-top:15px;position:relative;z-index:2;width:100%;padding:11px 14px;border:1px solid #27bce8;border-radius:9px;background:#095080;color:#f1fcff;font-weight:700;letter-spacing:.02em;font-size:12px;cursor:pointer;text-align:center}
+.eco-chat-launch:hover,.eco-chat-launch:focus-visible{background:#106da3;outline:2px solid #91ebff;outline-offset:2px}
+.eco-chat-panel[hidden]{display:none}
+.eco-chat-panel{position:fixed;inset:0;z-index:10000;background:#001020b8;display:flex;justify-content:flex-end;align-items:stretch;backdrop-filter:blur(3px)}
+.eco-chat-window{width:min(540px,100vw);max-height:100dvh;display:flex;flex-direction:column;background:linear-gradient(160deg,#081f44,#051329);border-left:1px solid #2d83aa;box-shadow:-12px 0 40px #0009;color:#ecfaff;font-family:inherit}
+.eco-chat-header{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:20px 19px 14px;border-bottom:1px solid #265476}
+.eco-chat-header h2{margin:0 0 4px;font-size:19px;color:#e4faff}
+.eco-chat-header p{margin:0;font-size:11px;line-height:1.5;color:#9ccae6}
+.eco-chat-close{flex:none;min-height:34px;min-width:34px;background:#113b60;border:1px solid #3f7fa1;color:#fff;border-radius:8px;cursor:pointer;font-size:22px}
+.eco-chat-close:focus-visible,.eco-chat-send:focus-visible,.eco-chat-examples button:focus-visible{outline:2px solid #8eedff;outline-offset:2px}
+.eco-chat-stamp{padding:10px 18px;color:#9ce8d8;font-size:11px;border-bottom:1px solid #193c5e}
+.eco-chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;align-items:stretch;gap:12px;min-height:130px;overscroll-behavior:contain}
+.eco-chat-message{font-size:13px;line-height:1.65;white-space:pre-line;border-radius:12px;padding:12px 13px;max-width:96%;overflow-wrap:anywhere}
+.eco-chat-question{background:#155d8a;border:1px solid #3a9bbd;align-self:flex-end}
+.eco-chat-answer{background:#102d4f;border:1px solid #264f6f;align-self:flex-start}
+.eco-chat-examples{display:flex;gap:7px;padding:8px 16px 4px;flex-wrap:wrap}
+.eco-chat-examples button{border:1px solid #33789f;background:#0b3859;color:#ceeefd;border-radius:24px;padding:7px 10px;font-size:11px;cursor:pointer}
+.eco-chat-form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #28516f}
+.eco-chat-form input{flex:1;min-width:0;color:#fff;border:1px solid #477a9c;background:#082441;border-radius:9px;padding:12px;font-size:13px;outline-offset:2px}
+.eco-chat-form input::placeholder{color:#a1bbd1}
+.eco-chat-send{flex:none;padding:10px 15px;border:1px solid #37c4e3;border-radius:9px;color:#fff;background:#1667a0;font-size:13px;cursor:pointer}
+.eco-chat-note{padding:0 16px 12px;color:#90aec7;font-size:10px;line-height:1.5}
+body.eco-chat-visible{overflow:hidden}
+@media(max-width:540px){.eco-chat-header{padding:15px 13px 11px}.eco-chat-window{width:100vw}.eco-chat-messages{padding:12px}.eco-chat-form{padding:12px}.eco-chat-examples{padding:8px 12px}}
+
 </style>
 </head>
 <body>
@@ -177,7 +204,7 @@ body.paused *,body.paused *:before,body.paused *:after{animation-play-state:paus
 </section>
 <section class="bottom-grid" aria-label="Información detallada demostrativa">
   <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">DATOS SIMULADOS</span></div><div class="latency" id="latency-list"></div></article>
-  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Diagnóstico con IA <span class="aux">CONCEPTO</span></div><div class="ai-signal">✦ RECOMENDACIÓN ILUSTRATIVA</div><h3 id="ai-title">Escenario de estabilidad</h3><p id="ai-description">Este panel mostrará diagnósticos respaldados por registros técnicos. La IA todavía no está conectada y no ha comprobado ninguna aplicación.</p><p class="small">La IA no modificará automáticamente código, datos ni permisos.</p><div class="ai-wave" aria-hidden="true"></div></article>
+  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Diagnóstico con IA <span class="aux">CONCEPTO</span></div><div class="ai-signal">✦ RECOMENDACIÓN ILUSTRATIVA</div><h3 id="ai-title">Escenario de estabilidad</h3><p id="ai-description">Este panel mostrará diagnósticos respaldados por registros técnicos. La IA todavía no está conectada y no ha comprobado ninguna aplicación.</p><p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Preguntar sobre los indicadores</button><div class="ai-wave" aria-hidden="true"></div></article>
   <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
 </section>
 <footer class="footer"><span>Monitor ECO V1 · Prototipo visual independiente · No conectado a Apps Script, Sheets ni Drive.</span><strong>NINGÚN ESTADO O NÚMERO CORRESPONDE A UNA VERIFICACIÓN REAL</strong></footer>
@@ -245,5 +272,28 @@ states();
 </script>
 <script src="./config.js?v=20261106-conexion1"></script>
 <script src="./monitor-live.js?v=20261107-diagnostico1"></script>
+<script src="./eco-analista.js?v=20261107-contexto1"></script>
+
+<div class="eco-chat-panel" id="eco-chat-panel" hidden role="presentation">
+  <section class="eco-chat-window" role="dialog" aria-modal="true" aria-labelledby="eco-chat-title" aria-describedby="eco-chat-intro">
+    <header class="eco-chat-header">
+      <div><h2 id="eco-chat-title">Analista Monitor ECO</h2><p id="eco-chat-intro">Consultas sobre lo que muestra el tablero; sin datos de otras aplicaciones.</p></div>
+      <button class="eco-chat-close" id="eco-chat-close" type="button" aria-label="Cerrar analista">×</button>
+    </header>
+    <div class="eco-chat-stamp" id="eco-chat-stamp" role="status">Esperando medición vigente</div>
+    <div class="eco-chat-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text"></div>
+    <div class="eco-chat-examples" aria-label="Preguntas de ejemplo">
+      <button type="button" data-eco-chat-ask="¿Cómo está el monitor?">Estado general</button>
+      <button type="button" data-eco-chat-ask="¿Por qué el Dashboard está sin conectar?">Dashboard</button>
+      <button type="button" data-eco-chat-ask="¿Qué anomalías hay y qué sugieres revisar?">Anomalías</button>
+      <button type="button" data-eco-chat-ask="¿Qué pasa con Mi Persona ECO?">Mi Persona</button>
+    </div>
+    <form class="eco-chat-form" id="eco-chat-form">
+      <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required aria-label="Pregunta para el analista" placeholder="Pregunta sobre el estado del monitor...">
+      <button class="eco-chat-send" type="submit">Enviar</button>
+    </form>
+    <p class="eco-chat-note">Interpretación contextual basada en mediciones publicadas. No es IA generativa; no modifica sistemas, no accede a datos personales ni conoce causas no verificadas.</p>
+  </section>
+</div>
 </body>
 </html>
