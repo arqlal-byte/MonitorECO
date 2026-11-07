@@ -270,9 +270,9 @@ function reply(question){
 /** Bienvenida basada exclusivamente en mediciones técnicas recientes, no en supuesta IA autónoma. */
 function welcomeState(){
  if(!snapshot)return {level:'pending',
-   message:'Estoy atento, cumpliendo mi trabajo. Estoy consultando las mediciones. ¿En qué puedo ayudarte?'};
+   message:'Estoy atento. Revisando las aplicaciones. ¿En qué puedo ayudarte?'};
  if(!isFresh())return {level:'pending',
-   message:'Estoy atento, cumpliendo mi trabajo. No cuento todavía con mediciones vigentes. ¿En qué puedo ayudarte?'};
+   message:'Estoy atento. Las mediciones no están actualizadas. ¿En qué puedo ayudarte?'};
  var c=snapshot.counts||{};
  var checks=[
    {key:'dashboard',valid:isDashboardFresh},
@@ -290,14 +290,14 @@ function welcomeState(){
  var countErrors=Number(c.error||0),countWarnings=Number(c.warning||0);
  if(countErrors>0||measured.some(function(a){return a&&a.status==='error';})||
      (serviceIsFresh&&service.status==='error'))
-   return {level:'error',message:'Estoy atento, cumpliendo mi trabajo. Detecté una incidencia en las comprobaciones técnicas. ¿Quieres que la revisemos?'};
+   return {level:'error',message:'Estoy atento. Hay una incidencia técnica. ¿La revisamos?'};
  if(countWarnings>0||measured.some(function(a){return a&&a.status==='warning';})||
      (serviceIsFresh&&service.status==='warning'))
-   return {level:'warning',message:'Estoy atento, cumpliendo mi trabajo. Hay una advertencia que conviene revisar. ¿En qué puedo ayudarte?'};
+   return {level:'warning',message:'Estoy atento. Detecté una advertencia. ¿La revisamos?'};
  if(Number(c.total)>0&&measured.length===6&&measured.every(function(a){return a&&a.status==='ok';})&&
      serviceIsFresh&&service.status==='ok'&&countErrors===0&&countWarnings===0)
-   return {level:'ok',message:'Estoy atento, cumpliendo mi trabajo. Por ahora parece que todo está bien. ¿En qué puedo ayudarte?'};
- return {level:'pending',message:'Estoy atento, cumpliendo mi trabajo. Algunas comprobaciones están pendientes o sin datos recientes. ¿En qué puedo ayudarte?'};
+   return {level:'ok',message:'Estoy atento, cumpliendo mi trabajo. Todo parece bien. ¿En qué puedo ayudarte?'};
+ return {level:'pending',message:'Estoy atento. Hay comprobaciones pendientes. ¿En qué puedo ayudarte?'};
 }
 function updateWelcome(){
  var state=welcomeState();
