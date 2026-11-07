@@ -471,7 +471,7 @@ body.eco-chat-visible{overflow:hidden}
 <footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
 <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
 </div>
-<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Simulado</span></p><p id="drawer-sources"><strong>Fuente:</strong> Mediciones técnicas publicadas por Monitor ECO.</p><p class="tagline" id="drawer-measure-note" hidden>Sin una medición vigente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
+<div class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-card"><button class="close" id="close-drawer" aria-label="Cerrar">✕</button><div class="tagline">DETALLE DE APLICACIÓN · MONITOREO</div><h2 id="drawer-title">Aplicación ECO</h2><p id="drawer-desc"></p><p><strong>Estado:</strong> <span id="drawer-state">Sin medición</span></p><p id="drawer-sources"><strong>Fuente:</strong> Mediciones técnicas publicadas por Monitor ECO.</p><p class="tagline" id="drawer-measure-note" hidden>Sin una medición vigente no se puede confirmar funcionamiento ni desconexión.</p></div></div>
 <script src="./config.js?v=20261106-conexion1"></script>
 <script>
 (function(){
@@ -506,7 +506,7 @@ body.eco-chat-visible{overflow:hidden}
  }
  if(!window.ECO_MONITOR_ENDPOINT){
   var n=document.querySelector('.notice');
-  if(n)n.textContent='◆ Monitor sin conexión a las mediciones. No se mostrarán datos simulados.';
+  if(n)n.textContent='◆ Monitor sin conexión a las mediciones. No se mostrarán cifras sin comprobar.';
   document.querySelectorAll('.appnode').forEach(function(node){node.addEventListener('click',unavailable);});
   var source=$('sources');if(source)source.addEventListener('click',unavailable);
  }
