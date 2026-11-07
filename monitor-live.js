@@ -41,8 +41,8 @@ function neutral(message){
  document.querySelectorAll('.appnode').forEach(function(n){
    var dot=n.querySelector('.dot'),status=n.querySelector('.node-status'),time=n.querySelector('.node-time');
    if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
-   if(status)status.lastChild.textContent=' Sin prueba funcional';
-   if(time)time.textContent='Aplicación no instrumentada';
+   if(status)status.lastChild.textContent=n.getAttribute('data-app')==='0'?' Sin medición reciente':' Sin prueba funcional';
+   if(time)time.textContent=n.getAttribute('data-app')==='0'?'Esperando prueba automática':'Aplicación no instrumentada';
    n.style.borderColor='#256181';
  });
  var sf=document.querySelector('.right-rail .panel .source-wrap');
@@ -73,13 +73,16 @@ function neutral(message){
 function dashboardDiagnostic(data){
  if(!data||!Array.isArray(data.apps))return null;
  var d=data.apps.find(function(a){return a&&a.key==='dashboard';});
- if(!d||d.check!=='CONSULTA_EJECUTIVA')return null;
- var age=Date.now()-Date.parse(d.checkedAt||'');
- if(!isFinite(age)||age<0||age>20*60*1000)return null;
- return d;
+ return d&&d.check==='CONSULTA_EJECUTIVA'?d:null;
+}
+function dashboardFresh(a){
+ if(!a||!a.checkedAt)return false;
+ var age=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(age)&&age>=0&&age<=20*60*1000;
 }
 function dashboardReason(a){
- if(!a)return 'El servicio no ha publicado una comprobación del Dashboard. Revisa que la versión nueva del Monitor ECO esté desplegada y que se haya ejecutado verificarDashboardECO_Ahora.';
+ if(!a)return 'No hay una medición reciente publicada del Dashboard. Esto no confirma una desconexión ni un error. Hay que comprobar que esté activo el disparador periódico verificarDashboardECO_Ahora en Apps Script del Monitor.';
+ if(!dashboardFresh(a))return 'La última comprobación publicada ya no está vigente (fecha: '+new Date(a.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'). No es evidencia de que el Dashboard esté desconectado; falta actualizar la medición automática.';
  var text={
   'SIN_CONFIGURACION':'La clave privada todavía no está disponible en las propiedades del proyecto Monitor ECO.',
   'NO_AUTORIZADO':'El Dashboard rechazó la autenticación de la comprobación. Revisa que ambos proyectos tengan exactamente la misma clave privada, sin publicarla.',
@@ -92,15 +95,32 @@ function dashboardReason(a){
  return text[String(a.code||'')]||'Existe una comprobación pendiente o no concluyente. Código técnico: '+String(a.code||'SIN_CODIGO').replace(/[^A-Z0-9_]/g,'').slice(0,40)+'.';
 }
 function verifiedDashboard(data){
- if(!data||!Array.isArray(data.apps))return null;
- var d=data.apps.find(function(a){return a&&a.key==='dashboard';});
- if(!d||d.check!=='CONSULTA_EJECUTIVA'||['ok','warning','error'].indexOf(d.status)<0)return null;
- var age=Date.now()-Date.parse(d.checkedAt||'');
- return isFinite(age)&&age>=0&&age<=20*60*1000?d:null;
+ var d=dashboardDiagnostic(data);
+ return d&&['ok','warning','error'].indexOf(d.status)>=0&&dashboardFresh(d)?d:null;
 }
 function renderDashboard(data,stale){
  var app=verifiedDashboard(data);
- if(!app)return; // Backend anterior o revisión no vigente: se conserva "Sin prueba".
+ if(!app){
+   var diagnostic=dashboardDiagnostic(data);
+   var missing=!diagnostic||!dashboardFresh(diagnostic);
+   var node=document.querySelector('.appnode[data-app="0"]');
+   if(node){
+     var state=node.querySelector('.node-status'),time=node.querySelector('.node-time');
+     var dot=node.querySelector('.dot'),tag=node.querySelector('.node-tag');
+     if(state&&state.lastChild)state.lastChild.textContent=missing?' Sin medición reciente':' Comprobación pendiente';
+     if(time)time.textContent=diagnostic&&diagnostic.checkedAt?
+       'Última prueba: '+new Date(diagnostic.checkedAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):
+       'Esperando prueba automática';
+     if(tag)tag.textContent=missing?'SIN MEDICIÓN':'PENDIENTE';
+     if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
+     node.style.borderColor='#256181';
+   }
+   var footer=document.querySelector('.footer strong');
+   if(footer)footer.textContent='DASHBOARD: '+(missing?'SIN MEDICIÓN RECIENTE':'COMPROBACIÓN PENDIENTE')+' · 5 APPS SIN PRUEBA';
+   var notice=document.querySelector('.notice');
+   if(notice&&missing)notice.textContent+=' · Dashboard: sin medición reciente; no significa desconexión.';
+   return;
+ }
  var statusText=app.status==='ok'?'Consulta ejecutiva correcta':
    app.status==='warning'?'Consulta con advertencia':'Error en consulta ejecutiva';
  var accent=app.status==='ok'?'#43ed80':app.status==='warning'?'#ffcc48':'#ff607a';
@@ -189,8 +209,8 @@ function apply(data){
  document.querySelectorAll('.appnode').forEach(function(n){
    var dot=n.querySelector('.dot'),status=n.querySelector('.node-status'),time=n.querySelector('.node-time');
    if(dot){dot.classList.remove('warn','error');dot.style.background='#7f9caf';dot.style.boxShadow='none';}
-   if(status)status.lastChild.textContent=' Sin prueba funcional';
-   if(time)time.textContent='Aplicación no instrumentada';
+   if(status)status.lastChild.textContent=n.getAttribute('data-app')==='0'?' Sin medición reciente':' Sin prueba funcional';
+   if(time)time.textContent=n.getAttribute('data-app')==='0'?'Esperando prueba automática':'Aplicación no instrumentada';
    n.style.borderColor='#256181';
  });
  var sf=document.querySelector('.right-rail .panel .source-wrap');
@@ -237,7 +257,7 @@ function apply(data){
  var footer=document.querySelector('.footer');
  if(footer)footer.innerHTML='<span>Monitor ECO v1.1 · Metadatos de Sheets verificados por un proyecto independiente. Última lectura: '+esc(data.lastCheck||'sin datos')+'</span><strong>LAS SEIS APLICACIONES NO TIENEN PRUEBA FUNCIONAL CONECTADA</strong>';
  var diagnostic=dashboardDiagnostic(data);
- if(diagnostic&&diagnostic.status==='unverified'){
+ if(diagnostic&&diagnostic.status==='unverified'&&dashboardFresh(diagnostic)){
    var dashNode=document.querySelector('.appnode[data-app="0"]');
    if(dashNode){
      var label=dashNode.querySelector('.node-status'),t=dashNode.querySelector('.node-time');
@@ -310,7 +330,8 @@ document.querySelectorAll('.appnode').forEach(function(node){
        dashboardReason(diagnostic)+'\nLos estados de Sheets no prueban por sí solos que el Dashboard funcione.':
        'Todavía no hay una comprobación funcional vigente conectada para esta aplicación. Las relaciones con Sheets siguen siendo referencias documentales.';
      $('drawer-desc').style.whiteSpace='pre-line';
-     openDrawer(data?data.name:'Aplicación ECO',explanation,diagnostic?'COMPROBACIÓN PENDIENTE':'SIN PRUEBA FUNCIONAL');
+     openDrawer(data?data.name:'Aplicación ECO',explanation,
+       app==='dashboard'?(diagnostic&&dashboardFresh(diagnostic)?'COMPROBACIÓN PENDIENTE':'SIN MEDICIÓN RECIENTE'):'SIN PRUEBA FUNCIONAL');
    }
  },true);
 });
