@@ -24,6 +24,7 @@
   var visitorName='';
   var visitorKey='';
   var feedbackPending=null;
+  var lastFeedbackId='';
   var feedbackReady=false;
   var feedbackOfferUsed=false;
   var visitorTurns=0;
@@ -132,6 +133,7 @@
     visitorTurns++;
     var params={question:q,history:previous,visitorName:visitorName,visitorKey:visitorKey};
     if(feedbackReady){
+      if(lastFeedbackId)params.lastFeedbackId=lastFeedbackId;
       if(feedbackPending)params.feedbackPending=JSON.stringify(feedbackPending);
       if(visitorTurns>=3&&!feedbackOfferUsed&&!feedbackPending){
         params.inviteFeedback='1';
@@ -144,6 +146,7 @@
         ?res.text.trim():String(res&&res.error||'No fue posible obtener una respuesta de OpenAI.');
       pendingAnswer.textContent=reply;
       if(res&&res.ok&&feedbackReady){
+        if(typeof res.feedbackReceiptId==='string'&&/^fb_[a-f0-9-]{36}$/i.test(res.feedbackReceiptId))lastFeedbackId=res.feedbackReceiptId;
         if(res.clearFeedback===true)feedbackPending=null;
         if(res.feedbackProposal&&typeof res.feedbackProposal==='object'){
           feedbackPending=res.feedbackProposal;
