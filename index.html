@@ -256,7 +256,7 @@ body.eco-chat-visible{overflow:hidden}
 .jarvis-compose input:focus{border-color:#87f4ff;outline:2px solid #27bbeb;outline-offset:2px;box-shadow:0 0 25px #0cf4ff44}
 .jarvis-messages[hidden]{display:none!important}
 .jarvis-messages{display:flex;flex-direction:column;gap:8px;align-items:stretch;max-height:350px;
- overflow-y:auto;margin-top:12px;padding:12px;border:1px solid #175c88;border-radius:12px;background:#04182f}
+ overflow-y:auto;margin:12px 0;padding:12px;border:1px solid #175c88;border-radius:12px;background:#04182f}
 .jarvis-messages .eco-chat-message{max-width:94%;padding:11px 14px;border-radius:10px;font-size:13px;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere}
 .jarvis-messages .eco-chat-answer{align-self:flex-start;background:#102d4f;border:1px solid #264f6f}
 .jarvis-messages .eco-chat-question{align-self:flex-end;background:#145582;border:1px solid #248eae}
@@ -419,13 +419,13 @@ body.eco-chat-visible{overflow:hidden}
   <h3 id="ai-title" class="sr-only">Analista contextual</h3>
   <p id="ai-description" class="sr-only">Consulta los resultados del monitor.</p>
   <div class="jarvis-console" id="eco-chat-panel" role="region" aria-label="Consulta a Jarvis">
+    <span class="sr-only" id="eco-chat-stamp" role="status">Esperando medición vigente</span>
+    <div class="jarvis-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text" hidden></div>
     <form class="jarvis-compose" id="eco-chat-form">
       <label class="sr-only" for="eco-chat-input">Escribe tu pregunta para Jarvis</label>
       <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required placeholder="Escribe tu pregunta aquí y presiona Enter…" aria-label="Pregunta para Jarvis ECO de Capital Humano">
       <button class="sr-only" type="submit">Enviar</button>
     </form>
-    <span class="sr-only" id="eco-chat-stamp" role="status">Esperando medición vigente</span>
-    <div class="jarvis-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text" hidden></div>
   </div>
 </section>
  <div class="network-topology">
