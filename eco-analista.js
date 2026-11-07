@@ -55,6 +55,16 @@ function servicioFresh(a){
  var ms=Date.now()-Date.parse(a.checkedAt);
  return isFinite(ms)&&ms>=0&&ms<=20*60*1000;
 }
+function individualFresh(a){
+ if(!a||a.check!=='CONSULTA_TECNICA_LIMITADA'||a.code==='MEDICION_VENCIDA'||!a.checkedAt)return false;
+ var ms=Date.now()-Date.parse(a.checkedAt);
+ return isFinite(ms)&&ms>=0&&ms<=20*60*1000&&['ok','warning','error'].indexOf(a.status)>=0;
+}
+function individualStatus(key){
+ var a=oneApp(key);
+ return individualFresh(a)?health(a)+' (lectura técnica parcial; sin sesión real ni guardado)':
+   'sin comprobación técnica individual vigente';
+}
 function servicioStatus(){
  var a=servicioDatos();
  if(!a||!servicioFresh(a))return 'sin medición reciente (no implica que esté desconectado)';
@@ -107,8 +117,11 @@ function answerApp(def){
    return msg+' La revisión no comprueba acceso de evaluadores, guardado de respuestas ni cálculos nocturnos.';
  }
  if(def.key==='administracion'||def.key==='persona'){
-   return def.name+': todavía no tiene una prueba funcional propia. '+answerService()+
-     ' Que el servicio compartido responda NO demuestra que esta aplicación pueda iniciar sesión ni guardar información.';
+   if(individualFresh(a))return def.name+': '+individualStatus(def.key)+
+     '. Última comprobación: '+datetime(a.checkedAt)+'. Código: '+String(a.code||'SIN_CODIGO')+
+     '. El monitor comprueba un mapeo de actividad real y el rechazo de un token inválido. No prueba login real, consultas autenticadas, operaciones de RH, evidencias ni guardados.';
+   return def.name+': todavía no tiene una prueba técnica individual vigente. '+answerService()+
+     ' La conexión compartida por sí sola no prueba que esta aplicación permita iniciar sesión ni guardar información.';
  }
  if(def.key==='familia')
    return 'Familia ECO consulta un servicio Apps Script propio, distinto de Servicio de Datos ECO. Su fuente de actividades familiares sí figura en las fuentes de Sheets, pero eso no prueba la carga real de la aplicación. La comprobación independiente sigue pendiente.';
@@ -143,8 +156,10 @@ function overview(){
  'Dashboard Ejecutivo ECO: '+dashboard+'.\n'+
  'Autoevaluación ECO V2.0: '+(isAutoevalFresh(oneApp('autoevaluacion'))?health(oneApp('autoevaluacion'))+' (solo estructura y catálogo)':'sin medición estructural reciente')+'.\n'+
  'Evaluación 360 ECO: '+(isEvaluacion360Fresh(oneApp('evaluacion360'))?health(oneApp('evaluacion360'))+' (solo estructura y preguntas)':'sin medición estructural reciente')+'.\n'+
- 'Servicio de Datos ECO: '+servicioStatus()+' (compartido por Centro y Mi Persona; no verifica sus funciones).\n'+
- 'Otras tres aplicaciones siguen sin prueba funcional conectada (Centro, Mi Persona y Familia).';
+ 'Servicio de Datos ECO: '+servicioStatus()+'.\n'+
+ 'Centro de Administración ECO: '+individualStatus('administracion')+'.\n'+
+ 'Mi Persona ECO: '+individualStatus('persona')+'.\n'+
+ 'Familia ECO: sin prueba técnica individual conectada.';
  var alerts=allSources().filter(function(x){return x.status==='error'||x.status==='warning';});
  if(alerts.length)r+='\nFuentes con alertas: '+alerts.map(function(x){return x.name+' ('+health(x)+')';}).join('; ')+'.';
  return r;
@@ -169,8 +184,14 @@ function anomaly(){
    out.push('Evaluación 360: revisión estructural '+health(eval360)+'. Código: '+String(eval360.code||'SIN_CODIGO').slice(0,40)+'.');
  if(servicioFresh(service)&&service.status!=='ok')
    out.push('Servicio de Datos: '+servicioStatus()+'. Centro y Mi Persona dependen de este servicio, pero la prueba no determina el estado funcional de esas aplicaciones.');
+ ['administracion','persona'].forEach(function(key){
+   var app=oneApp(key);
+   if(individualFresh(app)&&app.status!=='ok')
+     out.push((key==='administracion'?'Centro':'Mi Persona')+': comprobación parcial '+health(app)+
+       '. Código: '+String(app.code||'SIN_CODIGO').slice(0,40)+'.');
+ });
  alerts.forEach(function(x){out.push(x.name+': '+health(x)+'. '+advise(x));});
- if(!out.length)return 'No se detectan alertas entre las comprobaciones vigentes. Dashboard: consulta ejecutiva; Autoevaluación y Evaluación 360: estructura; Servicio de Datos: '+servicioStatus()+'. Tres aplicaciones siguen sin pruebas propias. Ninguna comprobación garantiza el funcionamiento integral.';
+ if(!out.length)return 'No se detectan alertas entre las comprobaciones vigentes. Dashboard: consulta ejecutiva; Autoevaluación y Evaluación 360: estructura; Servicio de Datos: '+servicioStatus()+'. Centro: '+individualStatus('administracion')+'. Mi Persona: '+individualStatus('persona')+'. Familia: sin prueba individual. Ninguna comprobación garantiza el funcionamiento integral.';
  return 'Anomalías que el Monitor sí registra:\n'+out.join('\n')+
    '\nSon comprobaciones técnicas, no una causa raíz confirmada.';
 }
@@ -222,7 +243,7 @@ function reply(question){
  }
  if(includesAny(q,['resumen','estado general','como esta','como va','que muestra','funcionando','todo bien','estado de las apps']))return overview();
  if(includesAny(q,['conectadas','sin conectar','no conectadas']))
-   return 'El Monitor comprueba Dashboard (consulta ejecutiva), Autoevaluación (estructura), Evaluación 360 (estructura) y Servicio de Datos (Bridge y nueve hojas). Centro y Mi Persona dependen del servicio, pero no tienen pruebas funcionales propias. Familia requiere una comprobación separada.';
+   return 'El Monitor comprueba Dashboard (consulta ejecutiva), Autoevaluación y Evaluación 360 (estructura), Servicio de Datos (Bridge), Centro: '+individualStatus('administracion')+' y Mi Persona: '+individualStatus('persona')+'. Familia requiere una comprobación separada. No se prueban logins reales ni guardados.';
  return 'Ese dato no aparece entre las mediciones disponibles del Monitor ECO. Solo puedo explicar las fuentes de Sheets, Dashboard, Autoevaluación, Evaluación 360, Servicio de Datos compartido, sus dependencias y el historial. No puedo atribuir causas sin registros.';
 }
 function add(text,kind){
