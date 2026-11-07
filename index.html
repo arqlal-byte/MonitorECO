@@ -229,6 +229,70 @@ body.eco-chat-visible{overflow:hidden}
 @media(max-width:460px){.network-topology{height:640px}.jarvis-head{grid-template-columns:82px minmax(0,1fr);gap:9px;align-items:start}.jarvis-visual img{max-width:82px}.jarvis-greeting{font-size:20px;line-height:1.27}.jarvis-kicker{font-size:9px;letter-spacing:.65px}.jarvis-words .ai-signal{font-size:8px}#jarvis-caption{font-size:7px}.jarvis-dock{padding:12px 11px 15px}.jarvis-compose input{min-height:53px;padding:12px;font-size:16px}}
 @media(prefers-reduced-motion:reduce){.network-topology:after,.jarvis-dock:before{animation:none}}
 
+
+/* Jarvis RH grande y centrado arriba; todos los resultados debajo. 2026-11-07 */
+.main-grid{display:block;grid-template-columns:none}
+.network-board{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.jarvis-dock{order:0;display:flex;align-items:center;flex-direction:column;text-align:center;gap:0;width:100%;z-index:7;
+ padding:23px 24px 22px;background:radial-gradient(ellipse at 50% 8%,#104d8c65,transparent 60%),linear-gradient(180deg,#040e1d,#05162d 88%);
+ border-bottom:1px solid #1175b4;isolation:isolate}
+.jarvis-dock:before{content:"";position:absolute;z-index:0;top:0;left:12%;right:12%;height:1px;
+ background:linear-gradient(90deg,transparent,#2ce0fb,transparent);box-shadow:0 0 13px #0db9ff99}
+.jarvis-visual{position:relative;z-index:1;width:clamp(235px,26vw,330px);max-width:80vw;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.jarvis-visual img{display:block;width:100%;height:auto;max-width:none;object-fit:contain;aspect-ratio:1;border-radius:50%;
+ background:#000;box-shadow:0 0 30px #02baf944;filter:drop-shadow(0 0 16px #168feb99)}
+.jarvis-visual[data-live="true"] img{box-shadow:0 0 37px #02ccff55}
+.jarvis-greeting{position:relative;z-index:1;font-size:clamp(25px,2.8vw,40px);line-height:1.27;font-weight:850;
+ letter-spacing:-.5px;text-align:center;max-width:1040px;color:#f0faff;text-shadow:0 0 16px #06a7fa42;
+ margin:14px auto 18px}
+.jarvis-dock[data-status="warning"] .jarvis-greeting{color:#ffe3a5}
+.jarvis-dock[data-status="error"] .jarvis-greeting{color:#ffc1c1}
+.jarvis-console{position:relative;z-index:2;width:min(890px,100%);margin:0 auto}
+.jarvis-compose{position:relative}
+.jarvis-compose input{width:100%;height:62px;padding:14px 21px;border:1px solid #38bafa;border-radius:13px;
+ background:linear-gradient(120deg,#07152b,#07375b 48%,#061b38);font-family:inherit;font-size:17px;font-weight:500;
+ color:white;outline:0;box-shadow:inset 0 0 20px #08446a88,0 0 18px #0099ee33}
+.jarvis-compose input::placeholder{color:#badcf1}
+.jarvis-compose input:focus{border-color:#87f4ff;outline:2px solid #27bbeb;outline-offset:2px;box-shadow:0 0 25px #0cf4ff44}
+.jarvis-messages[hidden]{display:none!important}
+.jarvis-messages{display:flex;flex-direction:column;gap:8px;align-items:stretch;max-height:350px;
+ overflow-y:auto;margin-top:12px;padding:12px;border:1px solid #175c88;border-radius:12px;background:#04182f}
+.jarvis-messages .eco-chat-message{max-width:94%;padding:11px 14px;border-radius:10px;font-size:13px;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere}
+.jarvis-messages .eco-chat-answer{align-self:flex-start;background:#102d4f;border:1px solid #264f6f}
+.jarvis-messages .eco-chat-question{align-self:flex-end;background:#145582;border:1px solid #248eae}
+.network-topology{order:1;position:relative;width:100%;height:515px;min-height:515px;flex:none;isolation:isolate}
+.network-topology:after{content:"";position:absolute;top:0;bottom:auto;left:50%;width:2px;height:72px;
+ transform:translateX(-50%);background:linear-gradient(180deg,#69dfff,transparent);
+ box-shadow:0 0 13px #2baeff88;animation:jarvisLink 3.4s ease-in-out infinite;pointer-events:none}
+.report-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.report-panels .rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;gap:10px;min-height:0;order:initial}
+.report-panels .panel{min-width:0;min-height:158px}
+.report-panels .source-wrap{flex-wrap:wrap}
+.report-panels .source-donut{width:76px;height:76px;flex-basis:76px}
+.report-panels .source-counts{flex:1 1 120px}
+.metrics{margin-top:12px}
+.controls{margin:10px 0 8px}
+@media(max-width:1100px){
+ .report-panels{grid-template-columns:1fr}
+ .report-panels .rail{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .network-topology{height:530px;min-height:530px;grid-row:auto;grid-column:auto}
+}
+@media(max-width:760px){
+ .jarvis-dock{padding:17px 13px 20px}
+ .jarvis-visual{width:clamp(190px,40vw,270px)}
+ .jarvis-greeting{font-size:clamp(23px,4.3vw,30px);margin-top:11px}
+ .report-panels .rail{grid-template-columns:1fr}
+ .report-panels .panel{min-height:120px}
+ .network-topology{height:580px;min-height:580px}
+}
+@media(max-width:460px){
+ .jarvis-visual{width:clamp(172px,52vw,225px)}
+ .jarvis-greeting{font-size:clamp(21px,5.6vw,26px);line-height:1.3}
+ .jarvis-compose input{height:56px;font-size:16px;padding:12px}
+ .network-topology{height:640px;min-height:640px}
+}
+@media(prefers-reduced-motion:reduce){.network-topology:after{animation:none}}
+
 </style>
 </head>
 <body>
@@ -239,35 +303,28 @@ body.eco-chat-visible{overflow:hidden}
   <div class="header-right"><div class="demo-pill"><span class="light"></span> CONSULTANDO MEDICIONES</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
 </header>
 
-<div class="controls">
-  <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
-  <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
-  <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
-  <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
-  <button class="ctrl danger" id="incident" aria-pressed="false">Simular incidencia</button>
-  <button class="ctrl outline" id="pause">Pausar animaciones</button>
-</div>
-<section class="metrics" aria-label="Indicadores generales; sin resultados simulados mientras se conecta">
-  <div class="kpi major"><div class="gauge"><span>—</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">SIN DATOS CONFIRMADOS</strong><div class="hint">Esperando comprobación de fuentes</div></div></div>
-  <div class="kpi"><div class="symbol">◈</div><div class="number">6</div><div class="hint">Aplicaciones objetivo</div></div>
-  <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">0</div><div class="hint">Aplicaciones verificadas</div></div>
-  <div class="kpi warn"><div class="symbol">⚠</div><div class="number" id="warnings">—</div><div class="hint">Advertencias por comprobar</div></div>
-  <div class="kpi error"><div class="symbol">✕</div><div class="number" id="failures">—</div><div class="hint">Fallas por comprobar</div></div>
-  <div class="kpi"><div class="symbol">▤</div><div class="number">—</div><div class="hint">Sheets sin medición</div></div>
-  <div class="kpi"><div class="symbol">⚙</div><div class="number">—</div><div class="hint">Procesos sin comprobar</div></div>
-  <div class="kpi"><div class="symbol">▥</div><div class="number">—</div><div class="hint">Disponibilidad no medida</div></div>
-</section>
 <section class="main-grid">
-  <div class="rail left-rail">
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">7 días · DEMO</span></div>
-      <svg class="line-chart" id="stability-chart" viewBox="0 0 300 100" role="img" aria-label="Gráfica demostrativa de estabilidad"><line class="gridline" x1="4" x2="296" y1="20" y2="20"/><line class="gridline" x1="4" x2="296" y1="50" y2="50"/><line class="gridline" x1="4" x2="296" y1="80" y2="80"/><path class="chart-shadow" id="line-shadow"/><path class="chart-line" id="line-path"/><g id="chart-points"></g></svg>
-      <div class="days" id="chart-days"><span>Sáb</span><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span></div>
-    </article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Incidencias por día <span class="aux">MUESTRA</span></div><div class="bars" id="incidence-bars"></div></article>
-    <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">MUESTRA</span></div><div class="event-content"><div class="donut"><div class="donut-inner">8<small>eventos demo</small></div></div><div class="event-legend"><div class="legend-row"><i class="legend-dot" style="background:#39e27b"></i>Normal <b>72%</b></div><div class="legend-row"><i class="legend-dot" style="background:#16cbff"></i>Procesos <b>17%</b></div><div class="legend-row"><i class="legend-dot" style="background:#fbc54e"></i>Advertencias <b>7%</b></div><div class="legend-row"><i class="legend-dot" style="background:#f05b70"></i>Incidencias <b>4%</b></div></div></div></article>
+ <main class="network-board" aria-label="Jarvis RH y topología de las seis aplicaciones">
+ <section class="jarvis-dock" id="assistant-hero" data-status="pending" aria-label="Jarvis RH — Asistente del centro de control">
+  <div class="jarvis-visual" data-live="false">
+    <img src="./assets/Jarvis_RH.gif" alt="Jarvis RH, animación holográfica del centro de control" width="414" height="414" loading="eager" decoding="async">
+    <span id="jarvis-caption" class="sr-only">CONSULTANDO ESTADO</span>
   </div>
-  <main class="network-board" aria-label="Topología visual interactiva de seis aplicaciones">
-    <div class="network-topology">
+  <p class="jarvis-greeting" id="eco-assistant-welcome" role="status" aria-live="polite">Estoy atento, cumpliendo mi trabajo. Estoy consultando las mediciones. ¿En qué puedo ayudarte?</p>
+  <span class="ai-signal sr-only">ESTADO DEL MONITOR</span>
+  <h3 id="ai-title" class="sr-only">Analista contextual</h3>
+  <p id="ai-description" class="sr-only">Consulta los resultados del monitor.</p>
+  <div class="jarvis-console" id="eco-chat-panel" role="region" aria-label="Consulta a Jarvis">
+    <form class="jarvis-compose" id="eco-chat-form">
+      <label class="sr-only" for="eco-chat-input">Escribe tu pregunta para Jarvis</label>
+      <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required placeholder="Escribe tu pregunta aquí y presiona Enter…" aria-label="Pregunta para Jarvis RH">
+      <button class="sr-only" type="submit">Enviar</button>
+    </form>
+    <span class="sr-only" id="eco-chat-stamp" role="status">Esperando medición vigente</span>
+    <div class="jarvis-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text" hidden></div>
+  </div>
+</section>
+ <div class="network-topology">
     <div class="network-label">◈ TOPOLOGÍA DEL <strong>ECOSISTEMA ECO</strong> · DEMO</div>
     <svg class="streams" viewBox="0 0 800 520" preserveAspectRatio="none" aria-hidden="true">
       <path class="stream-path" d="M400 255 L260 110 L145 110"/><path class="stream-flow" d="M400 255 L260 110 L145 110"/>
@@ -308,32 +365,37 @@ body.eco-chat-visible{overflow:hidden}
     <button class="appnode right2" data-app="3"><span class="node-icon">⚙</span><span class="node-tag">PENDIENTE</span><div class="node-name">Centro de Administración ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
     <button class="appnode right3" data-app="5"><span class="node-icon">♧</span><span class="node-tag">PENDIENTE</span><div class="node-name">Familia ECO</div><div class="node-status"><span class="dot"></span> Sin prueba funcional</div><div class="node-time">Prueba no instrumentada</div></button>
     </div>
-    <section class="jarvis-dock" id="assistant-hero" data-status="pending" aria-label="Consola integrada de Jarvis RH">
-      <div class="jarvis-head">
-        <div class="jarvis-visual" data-live="false" title="Jarvis RH, animación proporcionada para Monitor ECO">
-          <img src="./assets/Jarvis_RH.gif" alt="Jarvis RH, interfaz holográfica animada" width="414" height="414" loading="eager" decoding="async">
-          <span id="jarvis-caption">CONSULTANDO ESTADO</span>
-        </div>
-        <div class="jarvis-words">
-          <div class="jarvis-kicker"><span class="jarvis-dot" aria-hidden="true"></span> JARVIS RH <span class="jarvis-separator">/</span> CENTRO DE CONTROL</div>
-          <p class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</p>
-          <h3 id="ai-title" class="jarvis-subtitle">Analista contextual disponible</h3>
-          <p class="jarvis-greeting" id="eco-assistant-welcome" role="status" aria-live="polite">Estoy atento, cumpliendo mi trabajo. Estoy consultando las mediciones. ¿En qué puedo ayudarte?</p>
-          <p id="ai-description" class="jarvis-detail">Puedo responder sobre el estado de las seis aplicaciones y sus comprobaciones técnicas.</p>
-        </div>
-      </div>
-      <div class="jarvis-console" id="eco-chat-panel" role="region" aria-label="Conversación con Jarvis RH">
-        <form class="jarvis-compose" id="eco-chat-form">
-          <label class="sr-only" for="eco-chat-input">Escribe tu pregunta para Jarvis RH</label>
-          <input id="eco-chat-input" type="text" maxlength="500" autocomplete="off" required placeholder="Escribe tu pregunta aquí y presiona Enter…" aria-label="Pregunta para Jarvis RH">
-          <button class="sr-only" type="submit">Enviar pregunta</button>
-        </form>
-        <div class="jarvis-stamp" id="eco-chat-stamp" role="status">Esperando medición vigente</div>
-        <div class="jarvis-messages" id="eco-chat-messages" aria-live="polite" aria-relevant="additions text" hidden></div>
-        <p class="jarvis-note">Respuestas basadas en mediciones técnicas. No es IA generativa y no modifica aplicaciones ni datos.</p>
-      </div>
-    </section>
-  </main>
+</main>
+</section>
+<div class="controls">
+  <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
+  <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
+  <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
+  <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
+  <button class="ctrl danger" id="incident" aria-pressed="false">Simular incidencia</button>
+  <button class="ctrl outline" id="pause">Pausar animaciones</button>
+</div>
+
+<section class="metrics" aria-label="Indicadores generales; sin resultados simulados mientras se conecta">
+  <div class="kpi major"><div class="gauge"><span>—</span></div><div><h2>Estado del ecosistema</h2><strong id="general-state">SIN DATOS CONFIRMADOS</strong><div class="hint">Esperando comprobación de fuentes</div></div></div>
+  <div class="kpi"><div class="symbol">◈</div><div class="number">6</div><div class="hint">Aplicaciones objetivo</div></div>
+  <div class="kpi"><div class="symbol">✓</div><div class="number" id="healthy">0</div><div class="hint">Aplicaciones verificadas</div></div>
+  <div class="kpi warn"><div class="symbol">⚠</div><div class="number" id="warnings">—</div><div class="hint">Advertencias por comprobar</div></div>
+  <div class="kpi error"><div class="symbol">✕</div><div class="number" id="failures">—</div><div class="hint">Fallas por comprobar</div></div>
+  <div class="kpi"><div class="symbol">▤</div><div class="number">—</div><div class="hint">Sheets sin medición</div></div>
+  <div class="kpi"><div class="symbol">⚙</div><div class="number">—</div><div class="hint">Procesos sin comprobar</div></div>
+  <div class="kpi"><div class="symbol">▥</div><div class="number">—</div><div class="hint">Disponibilidad no medida</div></div>
+</section>
+
+<section class="report-panels" aria-label="Paneles de resultados del monitor">
+  <div class="rail left-rail">
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tendencia de estabilidad <span class="aux" id="period-label">7 días · DEMO</span></div>
+      <svg class="line-chart" id="stability-chart" viewBox="0 0 300 100" role="img" aria-label="Gráfica demostrativa de estabilidad"><line class="gridline" x1="4" x2="296" y1="20" y2="20"/><line class="gridline" x1="4" x2="296" y1="50" y2="50"/><line class="gridline" x1="4" x2="296" y1="80" y2="80"/><path class="chart-shadow" id="line-shadow"/><path class="chart-line" id="line-path"/><g id="chart-points"></g></svg>
+      <div class="days" id="chart-days"><span>Sáb</span><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span></div>
+    </article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Incidencias por día <span class="aux">MUESTRA</span></div><div class="bars" id="incidence-bars"></div></article>
+    <article class="panel"><div class="panel-title"><span class="tick"></span>Tipo de eventos <span class="aux">MUESTRA</span></div><div class="event-content"><div class="donut"><div class="donut-inner">8<small>eventos demo</small></div></div><div class="event-legend"><div class="legend-row"><i class="legend-dot" style="background:#39e27b"></i>Normal <b>72%</b></div><div class="legend-row"><i class="legend-dot" style="background:#16cbff"></i>Procesos <b>17%</b></div><div class="legend-row"><i class="legend-dot" style="background:#fbc54e"></i>Advertencias <b>7%</b></div><div class="legend-row"><i class="legend-dot" style="background:#f05b70"></i>Incidencias <b>4%</b></div></div></div></article>
+  </div>
   <aside class="rail right-rail">
     <article class="panel"><div class="panel-title"><span class="tick"></span>Estado de Sheets / Drive <span class="aux">DEMO</span></div><div class="source-wrap"><div class="source-donut"><div><strong>12</strong><span>Fuentes demo</span></div></div><div class="source-counts"><span>● Operativas <b>12</b></span><span style="color:#ffdb80">▲ Advertencia <b>0</b></span><span style="color:#ff8493">✕ Error <b>0</b></span><button class="ctrl" id="sources">Ver fuentes</button></div></div></article>
     <article class="panel"><div class="panel-title"><span class="tick"></span>Procesos automáticos <span class="aux">DEMO</span></div><div class="process-list"><div class="process"><i>✓</i><span>Promedios</span><time>05:00</time></div><div class="process"><i>✓</i><span>Actualización de datos</span><time>06:15</time></div><div class="process"><i>✓</i><span>Generación de informes</span><time>07:00</time></div><div class="process"><i>✓</i><span>Respaldos</span><time>01:00</time></div></div></article>
@@ -410,7 +472,7 @@ if(!window.ECO_MONITOR_ENDPOINT)states();
 })();
 </script>
 <script src="./monitor-live.js?v=20261107-familia1"></script>
-<script src="./eco-analista.js?v=20261107-jarvis-integrado1"></script>
+<script src="./eco-analista.js?v=20261107-jarvis-centrado2"></script>
 
 </body>
 </html>
