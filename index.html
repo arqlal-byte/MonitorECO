@@ -75,7 +75,7 @@ button{font:inherit}button:focus-visible{outline:2px solid var(--cyan);outline-o
 .process-list{display:grid;gap:7px}.process{display:flex;justify-content:space-between;gap:5px;align-items:center;font-size:10px;color:#cde7f7}.process i{font-style:normal;color:#49f37f;font-size:14px}.process span{margin-right:auto;min-width:0}.process time{color:#8fb8d2}
 .activity{display:grid;gap:6px}.activity-row{font-size:10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #194b74;padding-bottom:6px;color:#cbe4f6}
 .activity-row time{color:#77b5d6;font-variant-numeric:tabular-nums}.activity-row span{min-width:0}
-.bottom-grid{display:grid;grid-template-columns:1.12fr 1.34fr 1fr;gap:10px;margin-top:10px}
+.bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:10px}
 .bottom-grid .panel{min-height:169px}
 .latency{display:grid;gap:7px}.lat-row{display:grid;grid-template-columns:124px 1fr 36px;gap:8px;align-items:center;font-size:10px;color:#c1e5f9}
 .lat-track{height:10px;background:#102c50;border-radius:3px;overflow:hidden}.lat-track span{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#15c1f9,#5ae9ff);box-shadow:0 0 12px #11b0ff80;animation:sweep 1.4s both}.lat-row b{text-align:right;font-weight:700}
@@ -90,8 +90,8 @@ button{font:inherit}button:focus-visible{outline:2px solid var(--cyan);outline-o
 body.paused *,body.paused *:before,body.paused *:after{animation-play-state:paused!important}
 @keyframes grow{from{transform:scaleY(.02)}to{transform:scaleY(1)}}@keyframes sweep{from{width:0}to{width:var(--w)}}@keyframes float{50%{transform:translateY(-9px)}}@keyframes breath{50%{box-shadow:0 0 24px #21e8ff,inset 0 0 22px #31d5ff80;opacity:.76}}@keyframes movePath{to{stroke-dashoffset:-208}}@keyframes slowSpin{to{transform:rotate(360deg)}}@keyframes blink{50%{opacity:.55}}
 @media(max-width:1320px){.metrics{grid-template-columns:1.65fr repeat(7,1fr)}.main-grid{grid-template-columns:minmax(205px,.86fr) minmax(450px,1.72fr) minmax(220px,.96fr)}.appnode{width:165px;padding-left:41px}.node-name{font-size:10px}.node-icon{width:27px;height:27px;left:6px}.lat-row{grid-template-columns:100px 1fr 32px}}
-@media(max-width:1050px){.header{grid-template-columns:1fr 1.35fr}.header-right{grid-column:1/-1;justify-content:center}.metrics{grid-template-columns:repeat(4,1fr)}.kpi.major{grid-column:span 2}.main-grid{grid-template-columns:1fr 1fr}.network-board{grid-column:1/-1;grid-row:1;min-height:530px}.rail{grid-template-rows:repeat(3,minmax(145px,1fr));min-height:0}.bottom-grid{grid-template-columns:1fr 1fr}.bottom-grid .ai-panel{grid-column:span 2}}
-@media(max-width:680px){.dashboard{padding:10px}.header{display:flex;flex-direction:column;gap:7px}.corporate img{max-width:250px;max-height:55px}.brand-title h1{font-size:27px}.header-right{justify-content:center}.controls{justify-content:center}.notice{flex:1 0 100%;text-align:center;justify-content:center}.metrics{grid-template-columns:repeat(2,1fr)}.kpi.major{grid-column:span 2}.kpi{height:81px}.main-grid{display:flex;flex-direction:column}.network-board{order:0;min-height:580px}.rail{order:1;display:grid;grid-template-columns:1fr;grid-template-rows:none;gap:8px}.left-rail{order:1}.right-rail{order:2}.panel{min-height:135px}.appnode{width:165px;min-height:88px}.hub{width:190px;height:250px}.appnode.left1{top:11%;left:0}.appnode.left2{top:42%;left:0}.appnode.left3{top:73%;left:0}.appnode.right1{top:11%;right:0}.appnode.right2{top:42%;right:0}.appnode.right3{top:73%;right:0}.bottom-grid{grid-template-columns:1fr}.bottom-grid .ai-panel{grid-column:auto}.footer{flex-direction:column}.demo-watermark{bottom:7px;right:7px}}
+@media(max-width:1050px){.header{grid-template-columns:1fr 1.35fr}.header-right{grid-column:1/-1;justify-content:center}.metrics{grid-template-columns:repeat(4,1fr)}.kpi.major{grid-column:span 2}.main-grid{grid-template-columns:1fr 1fr}.network-board{grid-column:1/-1;grid-row:1;min-height:530px}.rail{grid-template-rows:repeat(3,minmax(145px,1fr));min-height:0}.bottom-grid{grid-template-columns:1fr 1fr}.bottom-grid .panel{min-width:0}}
+@media(max-width:680px){.dashboard{padding:10px}.header{display:flex;flex-direction:column;gap:7px}.corporate img{max-width:250px;max-height:55px}.brand-title h1{font-size:27px}.header-right{justify-content:center}.controls{justify-content:center}.notice{flex:1 0 100%;text-align:center;justify-content:center}.metrics{grid-template-columns:repeat(2,1fr)}.kpi.major{grid-column:span 2}.kpi{height:81px}.main-grid{display:flex;flex-direction:column}.network-board{order:0;min-height:580px}.rail{order:1;display:grid;grid-template-columns:1fr;grid-template-rows:none;gap:8px}.left-rail{order:1}.right-rail{order:2}.panel{min-height:135px}.appnode{width:165px;min-height:88px}.hub{width:190px;height:250px}.appnode.left1{top:11%;left:0}.appnode.left2{top:42%;left:0}.appnode.left3{top:73%;left:0}.appnode.right1{top:11%;right:0}.appnode.right2{top:42%;right:0}.appnode.right3{top:73%;right:0}.bottom-grid{grid-template-columns:1fr}.bottom-grid .panel{min-width:0}.footer{flex-direction:column}.demo-watermark{bottom:7px;right:7px}}
 @media(max-width:460px){.network-board{min-height:640px}.hub{top:47%;width:140px;height:205px}.appnode{width:calc(50% - 6px);font-size:10px;min-height:92px;padding:9px 5px 7px}.appnode .node-icon{display:none}.appnode .node-name{font-size:9px;min-height:30px}.appnode .node-status{font-size:9px;line-height:1.1}.appnode.left1,.appnode.right1{top:8%}.appnode.left2,.appnode.right2{top:74%}.appnode.left3,.appnode.right3{top:88%}.node-time{font-size:9px}.node-tag{font-size:8px;right:4px}.hub-base{font-size:7px}.network-label{font-size:9px}.bottom-grid .panel{min-height:160px}.lat-row{grid-template-columns:111px 1fr 32px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 
@@ -143,6 +143,49 @@ body.eco-chat-visible{overflow:hidden}
 @media(max-width:420px){.eco-bot-stage{flex-basis:82px;min-height:95px}.eco-bot{width:72px;height:84px}.eco-bot-orbit{width:65px;height:65px}.eco-bot-caption{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.eco-bot,.eco-bot-orbit,.eco-bot-eyes,.eco-bot-antenna,.eco-bot-heart{animation:none!important}}
 
+
+/* 2026-11-07: Asistente como recibimiento principal, sin alterar el monitor. */
+.assistant-hero{margin:10px 0 13px}
+.assistant-hero .ai-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(195px,245px);
+ gap:8px 24px;padding:15px 23px 17px;align-items:center;min-height:177px;
+ background:radial-gradient(circle at 9% 55%,#075a9488,transparent 29%),
+ linear-gradient(120deg,#0a2b57,#051b37 58%,#092550);border-color:#37aad5;
+ box-shadow:inset 0 0 24px #0977bf22,0 0 17px #005bb42a}
+.assistant-hero .panel-title{grid-column:1/-1;margin:0 0 2px;font-size:13px}
+.assistant-hero .ai-assistant-layout{grid-column:1;gap:18px;min-width:0;align-items:center}
+.assistant-hero .ai-assistant-info{min-width:0;flex:1}
+.assistant-hero .ai-signal{margin:0 0 5px}
+.assistant-hero .ai-panel h3{font-size:17px;margin:0 0 6px}
+.assistant-hero .ai-panel .eco-assistant-welcome{font-size:clamp(15px,1.35vw,20px);
+ line-height:1.42;font-weight:750;letter-spacing:.05px;color:#f2fcff;max-width:880px;
+ border-left:3px solid #4ddbbd;padding:7px 0 8px 13px;margin:0 0 7px}
+.assistant-hero[data-status="warning"] .eco-assistant-welcome{border-left-color:#ffd36a}
+.assistant-hero[data-status="error"] .eco-assistant-welcome{border-left-color:#ff7884}
+.assistant-hero[data-status="pending"] .eco-assistant-welcome{border-left-color:#64bde9}
+.assistant-hero .ai-panel #ai-description{max-width:none;font-size:11px;color:#bcdff2}
+.assistant-hero .ai-panel .small{font-size:10px;margin-top:5px;color:#88aac5}
+.assistant-hero .eco-bot-stage{order:-1;flex:0 0 120px;min-height:118px;margin:0}
+.assistant-hero .eco-bot-orbit{left:19px}
+.assistant-hero .eco-chat-launch{grid-column:2;grid-row:2;width:100%;margin:0;
+ min-height:52px;font-size:13px;border-radius:10px;z-index:3;
+ box-shadow:0 0 15px #06baff2a}
+.assistant-hero .ai-wave{pointer-events:none}
+@media(max-width:850px){
+ .assistant-hero .ai-panel{grid-template-columns:minmax(0,1fr);gap:12px;padding:15px}
+ .assistant-hero .panel-title{grid-column:1}
+ .assistant-hero .ai-assistant-layout{grid-column:1}
+ .assistant-hero .eco-chat-launch{grid-column:1;grid-row:auto;min-height:43px}
+}
+@media(max-width:480px){
+ .assistant-hero .ai-assistant-layout{gap:8px}
+ .assistant-hero .eco-bot-stage{flex:0 0 77px;min-height:94px}
+ .assistant-hero .eco-bot-orbit{left:9px}
+ .assistant-hero .ai-panel h3{font-size:14px}
+ .assistant-hero .ai-panel .eco-assistant-welcome{font-size:14px;padding-left:9px}
+ .assistant-hero .ai-panel #ai-description{font-size:10px}
+ .assistant-hero .panel-title{font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -152,6 +195,48 @@ body.eco-chat-visible{overflow:hidden}
   <div class="brand-title"><h1>MONITOR ECO</h1><p>CENTRO DE MONITOREO DEL ECOSISTEMA</p></div>
   <div class="header-right"><div class="demo-pill"><span class="light"></span> CONSULTANDO MEDICIONES</div><div class="clock" aria-live="polite"><span id="fecha">—</span><strong id="hora">—</strong></div></div>
 </header>
+<section class="assistant-hero" id="assistant-hero" aria-label="Asistente de Monitor ECO">
+<article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Tu asistente de Monitor ECO <span class="aux">VIGILANCIA TÉCNICA</span></div><div class="ai-assistant-layout">
+    <div class="ai-assistant-info">
+      <div class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</div>
+      <h3 id="ai-title">Asistente contextual ECO</h3>
+      <p class="eco-assistant-welcome" id="eco-assistant-welcome" role="status" aria-live="polite">Estoy atento, cumpliendo mi trabajo. Estoy revisando las mediciones. ¿En qué puedo ayudarte?</p>
+      <p id="ai-description">Puedes preguntar por el estado de Sheets, Dashboard y las aplicaciones aún sin prueba.</p>
+      <p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p>
+    </div>
+    <div class="eco-bot-stage" title="Mascota visual del analista; no representa una IA autónoma">
+      <span class="eco-bot-orbit" aria-hidden="true"></span>
+      <svg class="eco-bot" viewBox="0 0 130 146" role="img" aria-label="Pequeño robot animado del Analista Monitor ECO">
+        <defs>
+          <linearGradient id="ecoBotShell" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#d6fbff"/><stop offset=".43" stop-color="#79dfff"/><stop offset="1" stop-color="#1676b9"/>
+          </linearGradient>
+          <linearGradient id="ecoBotHead" x1="0" y1="0" x2="0" y2="1">
+            <stop stop-color="#d7f8ff"/><stop offset=".55" stop-color="#5cc3f4"/><stop offset="1" stop-color="#1a6cb2"/>
+          </linearGradient>
+        </defs>
+        <g class="eco-bot-antenna"><path d="M65 22V13" stroke="#76eaff" stroke-width="5" stroke-linecap="round"/><circle cx="65" cy="11" r="6.5" fill="#36eaff" stroke="#dcffff" stroke-width="2"/></g>
+        <ellipse cx="65" cy="139" rx="36" ry="5" fill="#06bbf0" opacity=".24"/>
+        <g class="eco-bot-body">
+          <rect x="43" y="102" width="44" height="27" rx="16" fill="url(#ecoBotShell)" stroke="#d3faff" stroke-width="2"/>
+          <rect x="54" y="107" width="22" height="11" rx="5.5" fill="#083d70" stroke="#58e8fb" stroke-width="1.5"/>
+          <circle cx="65" cy="112.5" r="3" fill="#53fbd7" class="eco-bot-heart"/>
+          <path d="M41 112L32 119M89 112L98 119" stroke="#86e9ff" stroke-width="10" stroke-linecap="round"/>
+          <path d="M55 128L51 136M75 128L79 136" stroke="#7fcdf5" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g class="eco-bot-head">
+          <rect x="22" y="24" width="86" height="79" rx="31" fill="url(#ecoBotHead)" stroke="#d6fcff" stroke-width="3"/>
+          <rect x="32" y="38" width="66" height="52" rx="21" fill="#08203e" stroke="#1cbfee" stroke-width="2.3"/>
+          <path d="M37 45Q54 35 89 46" stroke="#8defff" stroke-width="2" fill="none" opacity=".5"/>
+          <g class="eco-bot-eyes" fill="#7dffff"><ellipse cx="51" cy="62" rx="7" ry="9"/><ellipse cx="79" cy="62" rx="7" ry="9"/></g>
+          <path class="eco-bot-smile" d="M56 78Q65 84 74 78" fill="none" stroke="#70e8fa" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="25" cy="70" r="5" fill="#54eaff"/><circle cx="105" cy="70" r="5" fill="#54eaff"/>
+        </g>
+      </svg>
+      <span class="eco-bot-caption" id="eco-bot-caption">EN ESPERA</span>
+    </div>
+  </div><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Hablar con el asistente</button><div class="ai-wave" aria-hidden="true"></div></article>
+</section>
 <div class="controls">
   <div class="notice">◆ Consultando resultados del monitor · Esperando una medición reciente</div>
   <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
@@ -228,45 +313,7 @@ body.eco-chat-visible{overflow:hidden}
 </section>
 <section class="bottom-grid" aria-label="Información detallada demostrativa">
   <article class="panel"><div class="panel-title"><span class="tick"></span>Tiempo de respuesta promedio <span class="aux">DATOS SIMULADOS</span></div><div class="latency" id="latency-list"></div></article>
-  <article class="panel ai-panel"><div class="panel-title"><span class="tick"></span>Analista contextual <span class="aux">INDICADORES</span></div><div class="ai-assistant-layout">
-    <div class="ai-assistant-info">
-      <div class="ai-signal">✦ SOLO MEDICIONES DEL MONITOR</div>
-      <h3 id="ai-title">Consultas contextuales</h3>
-      <p id="ai-description">Puedes preguntar por el estado de Sheets, Dashboard y las aplicaciones aún sin prueba.</p>
-      <p class="small">Este analista responde solo con estados técnicos publicados. No genera diagnósticos externos.</p>
-    </div>
-    <div class="eco-bot-stage" title="Mascota visual del analista; no representa una IA autónoma">
-      <span class="eco-bot-orbit" aria-hidden="true"></span>
-      <svg class="eco-bot" viewBox="0 0 130 146" role="img" aria-label="Pequeño robot animado del Analista Monitor ECO">
-        <defs>
-          <linearGradient id="ecoBotShell" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#d6fbff"/><stop offset=".43" stop-color="#79dfff"/><stop offset="1" stop-color="#1676b9"/>
-          </linearGradient>
-          <linearGradient id="ecoBotHead" x1="0" y1="0" x2="0" y2="1">
-            <stop stop-color="#d7f8ff"/><stop offset=".55" stop-color="#5cc3f4"/><stop offset="1" stop-color="#1a6cb2"/>
-          </linearGradient>
-        </defs>
-        <g class="eco-bot-antenna"><path d="M65 22V13" stroke="#76eaff" stroke-width="5" stroke-linecap="round"/><circle cx="65" cy="11" r="6.5" fill="#36eaff" stroke="#dcffff" stroke-width="2"/></g>
-        <ellipse cx="65" cy="139" rx="36" ry="5" fill="#06bbf0" opacity=".24"/>
-        <g class="eco-bot-body">
-          <rect x="43" y="102" width="44" height="27" rx="16" fill="url(#ecoBotShell)" stroke="#d3faff" stroke-width="2"/>
-          <rect x="54" y="107" width="22" height="11" rx="5.5" fill="#083d70" stroke="#58e8fb" stroke-width="1.5"/>
-          <circle cx="65" cy="112.5" r="3" fill="#53fbd7" class="eco-bot-heart"/>
-          <path d="M41 112L32 119M89 112L98 119" stroke="#86e9ff" stroke-width="10" stroke-linecap="round"/>
-          <path d="M55 128L51 136M75 128L79 136" stroke="#7fcdf5" stroke-width="8" stroke-linecap="round"/>
-        </g>
-        <g class="eco-bot-head">
-          <rect x="22" y="24" width="86" height="79" rx="31" fill="url(#ecoBotHead)" stroke="#d6fcff" stroke-width="3"/>
-          <rect x="32" y="38" width="66" height="52" rx="21" fill="#08203e" stroke="#1cbfee" stroke-width="2.3"/>
-          <path d="M37 45Q54 35 89 46" stroke="#8defff" stroke-width="2" fill="none" opacity=".5"/>
-          <g class="eco-bot-eyes" fill="#7dffff"><ellipse cx="51" cy="62" rx="7" ry="9"/><ellipse cx="79" cy="62" rx="7" ry="9"/></g>
-          <path class="eco-bot-smile" d="M56 78Q65 84 74 78" fill="none" stroke="#70e8fa" stroke-width="2.6" stroke-linecap="round"/>
-          <circle cx="25" cy="70" r="5" fill="#54eaff"/><circle cx="105" cy="70" r="5" fill="#54eaff"/>
-        </g>
-      </svg>
-      <span class="eco-bot-caption" id="eco-bot-caption">EN ESPERA</span>
-    </div>
-  </div><button class="eco-chat-launch" id="eco-chat-open" type="button" aria-haspopup="dialog" aria-controls="eco-chat-panel">Preguntar sobre los indicadores</button><div class="ai-wave" aria-hidden="true"></div></article>
+  
   <article class="panel"><div class="panel-title"><span class="tick"></span>Resumen del día <span class="aux">DEMO</span></div><div class="daily"><div class="daily-list"><span>✓ Evaluaciones simuladas <b>37</b></span><span>✓ Evidencias simuladas <b>19</b></span><span>✓ Informes simulados <b>6</b></span></div><div class="mini-bars" aria-hidden="true"><i style="--h:31%"></i><i style="--h:43%"></i><i style="--h:60%"></i><i style="--h:72%"></i><i style="--h:90%"></i><i style="--h:100%"></i></div></div></article>
 </section>
 <footer class="footer"><span>Monitor ECO · Esperando lectura del servicio de comprobaciones técnicas.</span><strong>ESTADOS PENDIENTES DE CONFIRMAR</strong></footer>
@@ -355,7 +402,7 @@ if(!window.ECO_MONITOR_ENDPOINT)states();
   </section>
 </div>
 <script src="./monitor-live.js?v=20261107-familia1"></script>
-<script src="./eco-analista.js?v=20261107-familia1"></script>
+<script src="./eco-analista.js?v=20261107-asistente-top1"></script>
 
 </body>
 </html>
