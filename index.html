@@ -397,6 +397,21 @@ body.eco-chat-visible{overflow:hidden}
  .results-grid .panel{height:auto;min-height:165px!important;max-height:310px}
 }
 
+
+/* Etiqueta sutil de JARVIS ECO: no modifica ni cubre el GIF original. */
+.jarvis-training-note{
+  position:absolute;z-index:2;right:-43px;bottom:33px;
+  display:block;width:190px;box-sizing:border-box;
+  padding:7px 10px;border:1px solid rgba(105,215,255,.62);
+  border-radius:9px;background:rgba(3,20,41,.94);
+  color:#dbf6ff;box-shadow:0 4px 16px rgba(0,0,0,.4),0 0 13px rgba(12,170,235,.22);
+  font-size:11px;font-weight:700;line-height:1.35;letter-spacing:.01em;
+  text-align:center;transform:rotate(-13deg);pointer-events:none;
+}
+.jarvis-training-note span{display:block}
+@media(max-width:640px){
+  .jarvis-training-note{right:-8px;bottom:10px;width:158px;padding:6px 7px;font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -412,6 +427,7 @@ body.eco-chat-visible{overflow:hidden}
  <section class="jarvis-dock" id="assistant-hero" data-status="pending" aria-label="Jarvis RH — Asistente del centro de control">
   <div class="jarvis-visual" data-live="false">
     <img src="./assets/Jarvis_RH.gif" alt="Jarvis RH, animación holográfica del centro de control" width="414" height="414" loading="eager" decoding="async">
+    <span class="jarvis-training-note">Tenme paciencia,<span>estoy en capacitación</span></span>
     <span id="jarvis-caption" class="sr-only">CONSULTANDO ESTADO</span>
   </div>
   <p class="jarvis-greeting" id="eco-assistant-welcome" role="status" aria-live="polite">Bienvenido a mi lugar de trabajo</p>
