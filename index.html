@@ -478,6 +478,17 @@ body.eco-chat-visible{overflow:hidden}
   .network-topology .appnode .node-status{font-size:9px}
 }
 
+/* Indicadores: verde solo si una comprobación vigente confirma el resultado. */
+.metrics > .kpi.good{
+ border-color:#34ce75;
+ box-shadow:inset 0 0 18px #0d8c4b20,0 0 13px #26cb6840;
+}
+.metrics > .kpi.good:before{background:linear-gradient(90deg,transparent,#53ec9d88,transparent)}
+.metrics > .kpi.good .number,
+.metrics > .kpi.good .symbol,
+.metrics > .kpi.good.major strong{color:#4de38d;text-shadow:0 0 13px #20cb6f55}
+.metrics > .kpi.good.major .gauge{background:conic-gradient(#39de80 0 13%,#173450 13% 100%)}
+
 </style>
 </head>
 <body>
@@ -557,7 +568,6 @@ body.eco-chat-visible{overflow:hidden}
   <button class="ctrl" id="range24" data-range="24h" aria-pressed="false">24 h</button>
   <button class="ctrl" id="range7" data-range="7d" aria-pressed="true">7 días</button>
   <button class="ctrl" id="range30" data-range="30d" aria-pressed="false">30 días</button>
-  <button class="ctrl outline" id="pause">Pausar animaciones</button>
 </div>
 
 <section class="metrics" aria-label="Indicadores generales del monitor">
@@ -611,15 +621,6 @@ body.eco-chat-visible{overflow:hidden}
   if(time)time.textContent=new Intl.DateTimeFormat('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d)+' h';
  }
  clock();setInterval(clock,30000);
- var pause=$('pause');
- if(pause){
-  pause.textContent=paused?'Reanudar animaciones':'Pausar animaciones';
-  pause.addEventListener('click',function(){
-   paused=!paused;
-   document.body.classList.toggle('paused',paused);
-   pause.textContent=paused?'Reanudar animaciones':'Pausar animaciones';
-  });
- }
  function unavailable(){
   var title=$('drawer-title'),desc=$('drawer-desc'),state=$('drawer-state'),drawer=$('drawer');
   if(!drawer)return;
