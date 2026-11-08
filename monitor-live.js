@@ -27,6 +27,7 @@ function neutral(message){
  var gauge=document.querySelector('.gauge span');if(gauge)gauge.textContent='PEND.';
  var kpis=document.querySelectorAll('.metrics>.kpi');
  if(kpis.length>=8){
+   kpis.forEach(function(k){k.classList.remove('good');});
    kpis[0].querySelector('.hint').textContent='Esperando comprobación de fuentes';
    kpis[2].querySelector('.hint').textContent='Apps verificadas';
    kpis[3].querySelector('.hint').textContent='Alertas apps sin comprobar';
@@ -488,10 +489,13 @@ function renderFamilia(data){
    $('warnings').textContent=String(measured.filter(function(x){return x.status==='warning';}).length);
    $('failures').textContent=String(measured.filter(function(x){return x.status==='error';}).length);
    var labels=document.querySelectorAll('.metrics>.kpi');
-   if(labels.length>=5)[2,3,4].forEach(function(i){
-     var el=labels[i].querySelector('.hint');
-     if(el)el.textContent='Aplicaciones con comprobación técnica limitada';
-   });
+   if(labels.length>=5){
+     var labelsText=['Aplicaciones con comprobación técnica limitada','Advertencias detectadas','Errores detectados'];
+     [2,3,4].forEach(function(i,n){
+       var el=labels[i].querySelector('.hint');
+       if(el)el.textContent=labelsText[n];
+     });
+   }
    var marker=document.querySelector('.demo-watermark');
    if(marker)marker.textContent='SHEETS + '+measured.length+
      ' PRUEBAS TÉCNICAS · '+(6-measured.length)+' APPS SIN MEDICIÓN PROPIA';
@@ -609,6 +613,29 @@ function apply(data){
  renderEvaluacion360(data,stale);
  renderServicioDatos(data);
  renderFamilia(data);
+ colorizeValidatedSuccess(data,stale);
+}
+// Verde exclusivo para comprobaciones positivas vigentes; no certifica
+// que las aplicaciones estén completamente verificadas o sean seguras.
+function colorizeValidatedSuccess(data,stale){
+ var kpis=document.querySelectorAll('.metrics>.kpi');
+ if(kpis.length<8)return;
+ kpis.forEach(function(k){k.classList.remove('good');});
+ if(stale||!data||!data.counts)return;
+ var counts=data.counts;
+ var allSourcesOk=asNum(counts.total)>0&&asNum(counts.ok)===asNum(counts.total)&&
+   asNum(counts.warning)===0&&asNum(counts.error)===0;
+ if(allSourcesOk){
+   kpis[0].classList.add('good'); // Fuentes comprobadas sin alertas.
+   kpis[5].classList.add('good'); // Fuentes revisadas correctamente.
+ }
+ var healthyText=String($('healthy').textContent||'').trim();
+ // No considerar exitoso un "0" cuando ninguna aplicación tiene una medición.
+ if(/^[1-9][0-9]*$/.test(healthyText)){
+   kpis[2].classList.add('good');
+   if(String($('warnings').textContent||'').trim()==='0')kpis[3].classList.add('good');
+   if(String($('failures').textContent||'').trim()==='0')kpis[4].classList.add('good');
+ }
 }
 function renderHistory(history,counts){
  var records=history.slice(-7);
