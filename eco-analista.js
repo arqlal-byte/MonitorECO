@@ -321,10 +321,10 @@ function send(question){
  add(reply(q),'answer');
  input.value='';
 }
-form.addEventListener('submit',function(e){
- e.preventDefault();
- send(input.value);
-});
+// El chatbot de respuestas por reglas queda DESCONECTADO de la conversación.
+// Este archivo conserva únicamente su enlace de estado visual al Monitor ECO.
+// El envío de preguntas lo gestiona exclusivamente jarvis-openai.js.
+
 window.ecoMonitorReceiveSnapshot=function(data){
  snapshot=data&&typeof data==='object'?data:null;
  updateWelcome();
