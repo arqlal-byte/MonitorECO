@@ -489,6 +489,26 @@ body.eco-chat-visible{overflow:hidden}
 .metrics > .kpi.good.major strong{color:#4de38d;text-shadow:0 0 13px #20cb6f55}
 .metrics > .kpi.good.major .gauge{background:conic-gradient(#39de80 0 13%,#173450 13% 100%)}
 
+/* 2026-11-08 — Chat JARVIS: respuestas extensas legibles y preguntas alineadas. */
+.jarvis-messages{
+  max-height:none;
+  overflow-y:visible;
+  height:auto;
+}
+.jarvis-messages .eco-chat-answer{
+  text-align:left;
+  max-width:100%;
+}
+.jarvis-messages .eco-chat-question{
+  text-align:left;
+  align-self:flex-end; /* La burbuja permanece a la derecha. */
+}
+.jarvis-messages .eco-chat-answer strong{font-weight:750;color:#f5fcff}
+.jarvis-messages .eco-chat-answer em{font-style:italic}
+@media(max-width:680px){
+  .jarvis-messages{padding:10px}
+  .jarvis-messages .eco-chat-answer{width:100%}
+}
 </style>
 </head>
 <body>
@@ -644,7 +664,7 @@ body.eco-chat-visible{overflow:hidden}
 </script>
 <script src="./monitor-live.js?v=20261107-familia1"></script>
 <script src="./eco-analista.js?v=20261108-sin-respuestas-automaticas1"></script>
-<script src="./jarvis-openai.js?v=20261107-saludo-corto-pensando1"></script>
+<script src="./jarvis-openai.js?v=20261108-formato-chat-legible1"></script>
 
 </body>
 </html>
