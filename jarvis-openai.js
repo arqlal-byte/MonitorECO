@@ -69,6 +69,22 @@
       document.head.appendChild(script);
     });
   }
+  // Formato sencillo de las respuestas de IA: negritas/cursivas seguras, sin HTML de terceros.
+  // El historial conserva el texto original; solo cambia su representación visual.
+  function renderAssistantText(node,value){
+    var plain=String(value||'');
+    var pattern=/\*\*([\s\S]+?)\*\*|\*([^*\n]+?)\*/g;
+    var cursor=0,match;
+    while(node.firstChild)node.removeChild(node.firstChild);
+    while((match=pattern.exec(plain))!==null){
+      if(match.index>cursor)node.appendChild(document.createTextNode(plain.slice(cursor,match.index)));
+      var formatted=document.createElement(match[1]!==undefined?'strong':'em');
+      formatted.textContent=match[1]!==undefined?match[1]:match[2];
+      node.appendChild(formatted);
+      cursor=pattern.lastIndex;
+    }
+    if(cursor<plain.length)node.appendChild(document.createTextNode(plain.slice(cursor)));
+  }
   function append(text,kind){
     messages.hidden=false;
     var node=document.createElement('div');
@@ -155,7 +171,7 @@
     ask(params,90000).then(function(res){
       var reply=res&&res.ok&&typeof res.text==='string'&&res.text.trim()
         ?res.text.trim():String(res&&res.error||'No fue posible obtener una respuesta de OpenAI.');
-      pendingAnswer.textContent=reply;
+      renderAssistantText(pendingAnswer,reply);
       if(res&&res.ok&&feedbackReady){
         if(typeof res.feedbackReceiptId==='string'&&/^fb_[a-f0-9-]{36}$/i.test(res.feedbackReceiptId))lastFeedbackId=res.feedbackReceiptId;
         if(res.clearFeedback===true)feedbackPending=null;
@@ -177,8 +193,12 @@
       pendingAnswer.textContent='No fue posible contactar a OpenAI. Revisa la conexión y vuelve a intentarlo.';
     }).finally(function(){
       setBusy(false);
-      input.focus();
-      messages.scrollTop=messages.scrollHeight;
+      // En celular no devolver el foco al campo: evita que el teclado tape las respuestas largas.
+      if(window.matchMedia&&window.matchMedia('(max-width:680px)').matches){
+        if(document.activeElement===input)input.blur();
+      }else{
+        input.focus();
+      }
     });
   }
   // La bienvenida no depende de las mediciones del monitor ni de un ping de servidor.
